@@ -1,0 +1,14 @@
+syntax: glob
+
+target
+*~
+bin
+*.log
+*.jar
+gfembed*
+
+
+
+
+
+
