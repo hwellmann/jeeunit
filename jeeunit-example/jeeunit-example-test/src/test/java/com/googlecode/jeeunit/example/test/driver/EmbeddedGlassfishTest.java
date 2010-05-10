@@ -57,7 +57,7 @@ public class EmbeddedGlassfishTest {
 		server.start();
 
 		// Deploy your test app. Make sure to use the correct path
-		File war = new File("target/jeeunit-example-test-0.0.1.SNAPSHOT.war");
+		File war = new File("target/jeeunit-example-test-0.1.0.war");
 		EmbeddedDeployer deployer = server.getDeployer();
 		DeployCommandParameters params = new DeployCommandParameters();
 		params.contextroot = "itest";
