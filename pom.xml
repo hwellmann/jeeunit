@@ -10,6 +10,20 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <url>http://code.google.com/p/jeeunit/</url>
+  <inceptionYear>2010</inceptionYear>
+  <scm>
+    <connection>scm:hg:https://jeeunit.googlecode.com/hg</connection>
+    <developerConnection>scm:hg:https://jeeunit.googlecode.com/hg</developerConnection>
+    <url>http://code.google.com/p/jeeunit/source/browse</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>hwellmann</id>
+      <name>Harald Wellmann</name>
+      <email>harald.wellmann@gmx.de</email>
+    </developer>
+  </developers>
   <build>
     <pluginManagement>
       <plugins>
@@ -51,12 +65,28 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <modules>
     <module>jeeunit</module>
     <module>jeeunit-example</module>
   </modules>
 
-  
+  <profiles>
+    <profile>
+      <id>multi-m</id>
+      <distributionManagement>
+        <repository>
+          <id>multi-m.releases</id>
+          <name>MULTI-M Releases</name>
+          <url>http://hudson:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+          <id>multi-m.snapshots</id>
+          <name>MULTI-M Snapshots</name>
+          <url>http://hudson:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
 
 </project>
