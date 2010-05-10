@@ -3,11 +3,11 @@
   <parent>
     <artifactId>jeeunit-parent</artifactId>
     <groupId>com.googlecode.jeeunit</groupId>
-    <version>0.0.1.SNAPSHOT</version>
+    <version>0.1.0</version>
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-example</artifactId>
-  <version>0.0.1.SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>pom</packaging>
   <name>jeeunit Example</name>
   
