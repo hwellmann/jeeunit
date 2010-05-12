@@ -35,33 +35,33 @@ import com.googlecode.jeeunit.report.XmlFormatter;
 
 
 public class BaseTestServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
        
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/plain");
-		PrintWriter writer = response.getWriter();
-		writer.println("Running test suite....");
-		runSuite(writer);
-		writer.println("Test suite completed");
-		writer.close();
-	}
-	
-	
-	protected void runSuite(PrintWriter writer) {
-		JUnitCore core = new JUnitCore();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/plain");
+        PrintWriter writer = response.getWriter();
+        writer.println("Running test suite....");
+        runSuite(writer);
+        writer.println("Test suite completed");
+        writer.close();
+    }
+    
+    
+    protected void runSuite(PrintWriter writer) {
+        JUnitCore core = new JUnitCore();
         XmlFormatter formatter = new XmlFormatter();
         FailureCollector collector = new FailureCollector();
         core.addListener(formatter);
         core.addListener(collector);
-		core.run(getClass());
-		List<Failure> failures = collector.getFailures();
-		if (failures.isEmpty())
-		{
-			writer.println("All tests passed");
-		}
-		else
-		{
-			writer.println(failures.size() + " test failures");
-		}
-	}
+        core.run(getClass());
+        List<Failure> failures = collector.getFailures();
+        if (failures.isEmpty())
+        {
+            writer.println("All tests passed");
+        }
+        else
+        {
+            writer.println(failures.size() + " test failures");
+        }
+    }
 }

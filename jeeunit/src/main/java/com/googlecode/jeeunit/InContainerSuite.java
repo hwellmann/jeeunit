@@ -24,18 +24,18 @@ import org.junit.runners.model.RunnerBuilder;
 
 public class InContainerSuite extends Suite {
 
-	public InContainerSuite(Class<?> klass)
-			throws InitializationError {
-		super(klass, new InContainerRunnerBuilder());
-	}
+    public InContainerSuite(Class<?> klass)
+            throws InitializationError {
+        super(klass, new InContainerRunnerBuilder());
+    }
 
-	static class InContainerRunnerBuilder extends RunnerBuilder
-	{
+    static class InContainerRunnerBuilder extends RunnerBuilder
+    {
 
-		@Override
-		public Runner runnerForClass(Class<?> testClass) throws Throwable {
-			return new CdiJUnitRunner(testClass);
-		}		
-	}	
+        @Override
+        public Runner runnerForClass(Class<?> testClass) throws Throwable {
+            return new CdiJUnitRunner(testClass);
+        }       
+    }   
 }
 

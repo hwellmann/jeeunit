@@ -30,25 +30,25 @@ import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
 
 public class TitleTest {
-	
-	@EJB
-	private LibraryService service;
-	
-	@Before
-	public void setUp()
-	{
-		service.fillLibrary();
-	}
-	
-	@Test
-	public void byTitle()
-	{
-		List<Book> books = service.findBooksByTitle("East of Eden");
-		assertEquals(1, books.size());
-		
-		Book book = books.get(0);
-		assertEquals("Steinbeck", book.getAuthor().getLastName());
-	}
+    
+    @EJB
+    private LibraryService service;
+    
+    @Before
+    public void setUp()
+    {
+        service.fillLibrary();
+    }
+    
+    @Test
+    public void byTitle()
+    {
+        List<Book> books = service.findBooksByTitle("East of Eden");
+        assertEquals(1, books.size());
+        
+        Book book = books.get(0);
+        assertEquals("Steinbeck", book.getAuthor().getLastName());
+    }
 
 
 }

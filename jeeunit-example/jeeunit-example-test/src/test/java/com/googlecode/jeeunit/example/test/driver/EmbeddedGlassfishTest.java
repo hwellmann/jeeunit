@@ -36,44 +36,44 @@ import com.sun.jersey.api.client.Client;
 public class EmbeddedGlassfishTest {
 
 
-	@Test
-	public void runServer() throws IOException, LifecycleException, InterruptedException {
-		Server.Builder builder = new Server.Builder("IntegrationTest");
-		builder.verbose(false);
-		builder.logger(false);
+    @Test
+    public void runServer() throws IOException, LifecycleException, InterruptedException {
+        Server.Builder builder = new Server.Builder("IntegrationTest");
+        builder.verbose(false);
+        builder.logger(false);
 
-		// Define your JDBC resources and JNDI names in this config file
-		File domainConfig = new File("src/test/resources/domain.xml");
+        // Define your JDBC resources and JNDI names in this config file
+        File domainConfig = new File("src/test/resources/domain.xml");
 
-		// Build a file system for the embedded server
-		EmbeddedFileSystem.Builder efsb = new EmbeddedFileSystem.Builder();
-		efsb.configurationFile(domainConfig);
-		EmbeddedFileSystem efs = efsb.build();
-		builder.embeddedFileSystem(efs);
+        // Build a file system for the embedded server
+        EmbeddedFileSystem.Builder efsb = new EmbeddedFileSystem.Builder();
+        efsb.configurationFile(domainConfig);
+        EmbeddedFileSystem efs = efsb.build();
+        builder.embeddedFileSystem(efs);
 
-		// Build the server, including all containers (web, jpa, ejb, ...)
-		Server server = builder.build();
-		server.addContainer(ContainerBuilder.Type.all);
-		server.start();
+        // Build the server, including all containers (web, jpa, ejb, ...)
+        Server server = builder.build();
+        server.addContainer(ContainerBuilder.Type.all);
+        server.start();
 
-		// Deploy your test app. Make sure to use the correct path
-		File war = new File("target/jeeunit-example-test.war");
-		EmbeddedDeployer deployer = server.getDeployer();
-		DeployCommandParameters params = new DeployCommandParameters();
-		params.contextroot = "itest";
-		deployer.deploy(war, params);
+        // Deploy your test app. Make sure to use the correct path
+        File war = new File("target/jeeunit-example-test.war");
+        EmbeddedDeployer deployer = server.getDeployer();
+        DeployCommandParameters params = new DeployCommandParameters();
+        params.contextroot = "itest";
+        deployer.deploy(war, params);
 
-		// Do a GET request on the URL of your test servlet. Make sure
-		// the URL matches your server, context root, and the URL pattern
-		// used by your servlet
-		Client client = Client.create();
-		String result = client.resource("http://localhost:8080/itest/test").get(String.class);
-		
-		// The servlet simply returns plain text.
-		assertTrue(result.contains("All tests passed"));
-		
-		// Stop the server so that the test driver can terminate
-		deployer.undeployAll();
-		server.stop();
-	}
+        // Do a GET request on the URL of your test servlet. Make sure
+        // the URL matches your server, context root, and the URL pattern
+        // used by your servlet
+        Client client = Client.create();
+        String result = client.resource("http://localhost:8080/itest/test").get(String.class);
+        
+        // The servlet simply returns plain text.
+        assertTrue(result.contains("All tests passed"));
+        
+        // Stop the server so that the test driver can terminate
+        deployer.undeployAll();
+        server.stop();
+    }
 }

@@ -121,7 +121,7 @@ public class XmlFormatter extends RunListener
 
     public XmlFormatter()
     {
-		File outputDir = new File(REPORT_DIR);
+        File outputDir = new File(REPORT_DIR);
         outputDir.mkdirs();
     }
 

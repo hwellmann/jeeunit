@@ -29,10 +29,10 @@ import com.googlecode.jeeunit.InContainerSuite;
 @WebServlet(urlPatterns = "/test")
 @RunWith(InContainerSuite.class)
 @SuiteClasses({
-	AuthorTest.class, 
-	TitleTest.class
-	})
+    AuthorTest.class, 
+    TitleTest.class
+    })
 public class LibraryTestServlet extends BaseTestServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
        
 }

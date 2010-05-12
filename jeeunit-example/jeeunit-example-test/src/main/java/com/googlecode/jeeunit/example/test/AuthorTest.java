@@ -31,21 +31,21 @@ import com.googlecode.jeeunit.example.service.LibraryService;
 
 public class AuthorTest {
 
-	@EJB
-	private LibraryService service;
+    @EJB
+    private LibraryService service;
 
-	@Before
-	public void setUp() {
-		service.fillLibrary();
-	}
+    @Before
+    public void setUp() {
+        service.fillLibrary();
+    }
 
-	@Test
-	public void byAuthor() {
-		List<Book> books = service.findBooksByAuthor("Mann");
-		assertEquals(1, books.size());
+    @Test
+    public void byAuthor() {
+        List<Book> books = service.findBooksByAuthor("Mann");
+        assertEquals(1, books.size());
 
-		Book book = books.get(0);
-		assertEquals("Buddenbrooks", book.getTitle());
-	}
+        Book book = books.get(0);
+        assertEquals("Buddenbrooks", book.getTitle());
+    }
 
 }
