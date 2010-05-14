@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import javax.ejb.EJB;
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import com.googlecode.jeeunit.example.service.LibraryService;
 
 public class TitleTest {
     
-    @EJB
+    @Inject
     private LibraryService service;
     
     @Before
