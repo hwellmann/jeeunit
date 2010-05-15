@@ -48,6 +48,8 @@ public class EmbeddedGlassfishTest {
         // Build a file system for the embedded server
         EmbeddedFileSystem.Builder efsb = new EmbeddedFileSystem.Builder();
         efsb.configurationFile(domainConfig);
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        efsb.instanceRoot(new File(tmpDir, "gfembed"));
         EmbeddedFileSystem efs = efsb.build();
         builder.embeddedFileSystem(efs);
 
