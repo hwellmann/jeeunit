@@ -21,11 +21,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.Failure;
@@ -36,6 +37,9 @@ import com.googlecode.jeeunit.report.XmlFormatter;
 
 public class BaseTestServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
+    @Inject 
+    public BeanManager mgr;
        
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
@@ -48,6 +52,7 @@ public class BaseTestServlet extends HttpServlet {
     
     
     protected void runSuite(PrintWriter writer) {
+        CdiJUnitRunner.setBeanManager(mgr);
         JUnitCore core = new JUnitCore();
         XmlFormatter formatter = new XmlFormatter();
         FailureCollector collector = new FailureCollector();

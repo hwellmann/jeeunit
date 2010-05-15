@@ -21,8 +21,6 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
@@ -30,10 +28,8 @@ import org.junit.runners.model.InitializationError;
 public class CdiJUnitRunner extends BlockJUnit4ClassRunner
 {
 
-    private static final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
-
-    private static BeanManager mgr = lookupBeanManager();
-
+    private static BeanManager mgr;
+    
     public CdiJUnitRunner(Class<?> klass) throws InitializationError
     {
         super(klass);
@@ -56,17 +52,8 @@ public class CdiJUnitRunner extends BlockJUnit4ClassRunner
         target.inject(test, context);
     }
 
-    private static BeanManager lookupBeanManager()
+    public static void setBeanManager(BeanManager mgr)
     {
-        try
-        {
-            InitialContext ctx = new InitialContext();
-            mgr = (BeanManager) ctx.lookup(BEAN_MANAGER_JNDI);
-        }
-        catch (NamingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        return mgr;
+        CdiJUnitRunner.mgr = mgr;
     }
 }
