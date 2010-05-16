@@ -7,6 +7,7 @@
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-weld-se</artifactId>
+  <name>jeeunit Bean Manager Provider using Weld SE</name>
   <version>0.2.0.SNAPSHOT</version>
   <dependencies>
   	<dependency>
