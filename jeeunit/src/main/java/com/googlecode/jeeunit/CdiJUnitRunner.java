@@ -28,7 +28,7 @@ import org.junit.runners.model.InitializationError;
 public class CdiJUnitRunner extends BlockJUnit4ClassRunner
 {
 
-    private static BeanManager mgr;
+    private static BeanManager mgr = BeanManagerLookup.getBeanManager();
     
     public CdiJUnitRunner(Class<?> klass) throws InitializationError
     {
@@ -50,10 +50,5 @@ public class CdiJUnitRunner extends BlockJUnit4ClassRunner
         InjectionTarget target = mgr.createInjectionTarget(annotatedType);
         CreationalContext context = mgr.createCreationalContext(null);
         target.inject(test, context);
-    }
-
-    public static void setBeanManager(BeanManager mgr)
-    {
-        CdiJUnitRunner.mgr = mgr;
     }
 }

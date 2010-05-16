@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>jeeunit-parent</artifactId>
+    <groupId>com.googlecode.jeeunit</groupId>
+    <version>0.2.0.SNAPSHOT</version>
+  </parent>
+  <groupId>com.googlecode.jeeunit</groupId>
+  <artifactId>jeeunit-weld-se</artifactId>
+  <version>0.2.0.SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.googlecode.jeeunit</groupId>
+  		<artifactId>jeeunit</artifactId>
+  		<version>0.2.0.SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jboss.weld</groupId>
+  		<artifactId>weld-se</artifactId>
+  		<version>1.0.1-Final</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  </dependencies>
+</project>

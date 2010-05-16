@@ -15,5 +15,6 @@
     <module>jeeunit-example-model</module>
     <module>jeeunit-example-service</module>
     <module>jeeunit-example-test</module>
+    <module>jeeunit-example-test-se</module>
   </modules>
 </project>

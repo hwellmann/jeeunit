@@ -68,6 +68,7 @@
   <modules>
     <module>jeeunit</module>
     <module>jeeunit-example</module>
+    <module>jeeunit-weld-se</module>
   </modules>
 
   <profiles>

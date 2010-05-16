@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +32,11 @@ import org.junit.runner.notification.Failure;
 import com.googlecode.jeeunit.report.FailureCollector;
 import com.googlecode.jeeunit.report.XmlFormatter;
 
-
 public class BaseTestServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
-    @Inject 
-    public BeanManager mgr;
-       
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
         PrintWriter writer = response.getWriter();
         writer.println("Running test suite....");
@@ -49,10 +44,8 @@ public class BaseTestServlet extends HttpServlet {
         writer.println("Test suite completed");
         writer.close();
     }
-    
-    
+
     protected void runSuite(PrintWriter writer) {
-        CdiJUnitRunner.setBeanManager(mgr);
         JUnitCore core = new JUnitCore();
         XmlFormatter formatter = new XmlFormatter();
         FailureCollector collector = new FailureCollector();
@@ -60,12 +53,9 @@ public class BaseTestServlet extends HttpServlet {
         core.addListener(collector);
         core.run(getClass());
         List<Failure> failures = collector.getFailures();
-        if (failures.isEmpty())
-        {
+        if (failures.isEmpty()) {
             writer.println("All tests passed");
-        }
-        else
-        {
+        } else {
             writer.println(failures.size() + " test failures");
         }
     }
