@@ -3,17 +3,17 @@
   <parent>
     <artifactId>jeeunit-parent</artifactId>
     <groupId>com.googlecode.jeeunit</groupId>
-    <version>0.2.0</version>
+    <version>0.3.0.SNAPSHOT</version>
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-weld-se</artifactId>
   <name>jeeunit Bean Manager Provider using Weld SE</name>
-  <version>0.2.0</version>
+  <version>0.3.0.SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>com.googlecode.jeeunit</groupId>
   		<artifactId>jeeunit</artifactId>
-  		<version>0.2.0</version>
+  		<version>0.3.0.SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
