@@ -13,7 +13,7 @@
   	<dependency>
   		<groupId>com.googlecode.jeeunit</groupId>
   		<artifactId>jeeunit</artifactId>
-  		<version>0.3.0.SNAPSHOT</version>
+         <version>${project.version}</version>        
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
