@@ -18,12 +18,19 @@
 package com.googlecode.jeeunit.example.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.googlecode.jeeunit.example.model.Book;
@@ -46,6 +53,33 @@ public class AuthorTest {
 
         Book book = books.get(0);
         assertEquals("Buddenbrooks", book.getTitle());
+    }
+
+    /**
+     * Test case for Glassfish <a
+     * href="https://glassfish.dev.java.net/issues/show_bug.cgi?id=12599">bug #12599</a>.
+     * 
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    @Test
+    @Ignore
+    public void serialization() throws IOException, ClassNotFoundException {
+        long expectedNumBooks = service.getNumBooks();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(service);
+        oos.close();
+
+        byte[] bytes = baos.toByteArray();
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object obj = ois.readObject();
+        assertTrue(obj instanceof LibraryService);
+        
+        // the deserialized proxy throws a NullPointerException on method invocation
+        long numBooks = ((LibraryService) obj).getNumBooks();
+        assertEquals(expectedNumBooks, numBooks);
     }
 
 }
