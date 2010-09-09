@@ -17,6 +17,7 @@
 
 package com.googlecode.jeeunit.example.service;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -28,7 +29,9 @@ import com.googlecode.jeeunit.example.model.Author;
 import com.googlecode.jeeunit.example.model.Book;
 
 @Stateless
-public class LibraryService {
+public class LibraryService implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     
     @PersistenceContext
     private EntityManager em;
