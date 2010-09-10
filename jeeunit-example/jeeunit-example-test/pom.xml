@@ -25,6 +25,11 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-glassfish</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -94,6 +94,7 @@
     <module>jeeunit</module>
     <module>jeeunit-example</module>
     <module>jeeunit-weld-se</module>
+    <module>jeeunit-glassfish</module>
   </modules>
 
   <profiles>
