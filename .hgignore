@@ -1,0 +1,16 @@
+syntax: glob
+
+target
+*~
+bin
+*.log
+*.jar
+gfembed*
+release.properties
+pom.xml.releaseBackup
+
+
+
+
+
+

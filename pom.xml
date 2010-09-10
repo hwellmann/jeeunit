@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.googlecode.jeeunit</groupId>
+  <version>0.4.0.SNAPSHOT</version>
+  <artifactId>jeeunit-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>jeeunit Parent</name>
+  <description>In-Container Integration Testing for Java EE 6</description>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <url>http://code.google.com/p/jeeunit/</url>
+  <inceptionYear>2010</inceptionYear>
+  <scm>
+    <connection>scm:hg:https://jeeunit.googlecode.com/hg</connection>
+    <developerConnection>scm:hg:https://jeeunit.googlecode.com/hg</developerConnection>
+    <url>http://code.google.com/p/jeeunit/source/browse</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>hwellmann</id>
+      <name>Harald Wellmann</name>
+      <email>harald.wellmann@gmx.de</email>
+    </developer>
+  </developers>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.1-beta-1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.8.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.extras</groupId>
+        <artifactId>glassfish-embedded-all</artifactId>
+        <version>3.0.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-ejb_3.1_spec</artifactId>
+        <version>1.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-servlet_3.0_spec</artifactId>
+        <version>1.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-atinject_1.0_spec</artifactId>
+        <version>1.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jcdi_1.0_spec</artifactId>
+        <version>1.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jpa_2.0_spec</artifactId>
+        <version>1.1</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>jeeunit</module>
+    <module>jeeunit-example</module>
+    <module>jeeunit-weld-se</module>
+    <module>jeeunit-glassfish</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>multi-m</id>
+      <distributionManagement>
+        <repository>
+          <id>multi-m.releases</id>
+          <name>MULTI-M Releases</name>
+          <url>http://hudson:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+          <id>multi-m.snapshots</id>
+          <name>MULTI-M Snapshots</name>
+          <url>http://hudson:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
+</project>
