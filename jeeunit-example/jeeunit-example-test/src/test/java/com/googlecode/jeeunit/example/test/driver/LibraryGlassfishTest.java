@@ -26,10 +26,10 @@ import org.junit.Test;
 import com.googlecode.jeeunit.glassfish.GlassfishTestDriver;
 
 
-public class EmbeddedGlassfishTest extends GlassfishTestDriver {
+public class LibraryGlassfishTest extends GlassfishTestDriver {
 
 
-    public EmbeddedGlassfishTest() {
+    public LibraryGlassfishTest() {
         File domainConfig = new File("src/test/resources/domain.xml");
         setConfiguration(domainConfig);
         
