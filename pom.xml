@@ -113,6 +113,21 @@
         </snapshotRepository>
       </distributionManagement>
     </profile>
+    <profile>
+      <id>sonatype.oss.staging</id>
+      <distributionManagement>
+        <repository>
+          <id>sonatype.oss.staging</id>
+          <name>Sonatype OSS Staging</name>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+          <id>sonatype.oss.snapshots</id>
+          <name>Sonatype OSS Snapshots</name>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
   </profiles>
 
 </project>
