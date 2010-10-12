@@ -44,6 +44,9 @@ public class XmlConstants
     /** the error element */
     public static final String ERROR = "error";
 
+    /** the skipped element */
+    public static final String SKIPPED = "skipped";
+
     /** the failure element */
     public static final String FAILURE = "failure";
 
