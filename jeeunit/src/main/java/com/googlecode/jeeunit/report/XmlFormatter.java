@@ -307,7 +307,7 @@ public class XmlFormatter extends RunListener
     @Override
     public void testIgnored(Description description)
     {
-        formatError(ERROR, description, null);
+        formatError(SKIPPED, description, null);
     }
 
     private void formatError(String type, Description description, Throwable t)
