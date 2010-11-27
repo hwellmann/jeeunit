@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -36,6 +37,7 @@ public class LibraryService implements Serializable {
     @PersistenceContext
     private EntityManager em;
     
+    @TransactionAttribute
     public void fillLibrary()
     {
         if (getNumBooks() != 0)
@@ -65,6 +67,7 @@ public class LibraryService implements Serializable {
         em.persist(eden);
     }
     
+    @TransactionAttribute
     public List<Book> findBooksByAuthor(String lastName)
     {
         String jpql = "select b from Book b where b.author.lastName = :lastName";
@@ -74,6 +77,7 @@ public class LibraryService implements Serializable {
         return books;       
     }
     
+    @TransactionAttribute
     public List<Book> findBooksByTitle(String title)
     {
         String jpql = "select b from Book b where b.title = :title";
@@ -83,6 +87,7 @@ public class LibraryService implements Serializable {
         return books;       
     }
     
+    @TransactionAttribute
     public long getNumBooks()
     {
         String jpql = "select count(b) from Book b";
