@@ -16,5 +16,6 @@
     <module>jeeunit-example-service</module>
     <module>jeeunit-example-test</module>
     <module>jeeunit-example-test-se</module>
+    <module>jeeunit-example-test-spring</module>
   </modules>
 </project>
