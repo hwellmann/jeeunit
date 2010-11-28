@@ -29,6 +29,19 @@ import javax.persistence.TypedQuery;
 import com.googlecode.jeeunit.example.model.Author;
 import com.googlecode.jeeunit.example.model.Book;
 
+/**
+ * NOTE: By the EJB 3.1 specification, all public business methods are transactional by default,
+ * with a REQUIRED transaction type, so the <code>@TransactionAttribute</code> annotations on the
+ * methods of this class are redundant.
+ * <p>
+ * However, by adding these annotations, we can use this class both in a Java EE 6 and in a Spring
+ * 3.0.x container. Of course, the preferred solution would be if Spring supported the
+ * <code>@Stateless</code> and other EJB annotations <a
+ * href="https://jira.springframework.org/browse/SPR-3858">out-of-the-box</a>.
+ * 
+ * @author hwellmann
+ * 
+ */
 @Stateless
 public class LibraryService implements Serializable {
     

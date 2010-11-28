@@ -8,8 +8,28 @@
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+  <!-- Enable configuration by Java annotations to avoid XML as much as possible. -->
+  <context:annotation-config/>
+  
+  <!-- The following delegates the rest of the configuration to a Java bean. -->
+  <bean class="com.googlecode.jeeunit.example.test.spring.SpringTestConfig"/>
+
+
+  <!-- 
+       You can replace the previous two elements by the following one. This will pick up all
+       configuration classes and other beans in or below the given package, so you may get more
+       than you were asking for.
+   -->
+  <!--context:component-scan base-package="com.googlecode.jeeunit.example.service"/-->
+
+  <!-- 
+       Alas, annotation-driven transactions can only be enabled by XML in Spring 3.0.x. 
+       The @AnnotationDrivenTx annotation from the Java Config project is not supported.
+       
+       The proxy-target-class setting is required to make proxies work when our transactional
+       beans are Serializable. 
+  -->
   <tx:annotation-driven proxy-target-class="true"/>
-  <context:component-scan base-package="com.googlecode.jeeunit.example.test.spring"/>
 
 </beans>
 
