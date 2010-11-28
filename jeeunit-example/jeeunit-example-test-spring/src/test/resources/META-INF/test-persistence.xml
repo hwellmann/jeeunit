@@ -3,6 +3,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 
+
+  <!-- 
+       For testing our persistence unit under Spring, the default transaction type JTA does
+       not work, so we need a separate test-persistence.xml to override the Java EE settings.
+       TODO: Is there a way to avoid this?
+   -->
   <persistence-unit name="library" transaction-type="RESOURCE_LOCAL">
     <class>com.googlecode.jeeunit.example.model.Author</class>
     <class>com.googlecode.jeeunit.example.model.Book</class>
