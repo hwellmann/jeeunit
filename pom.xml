@@ -98,21 +98,6 @@
 
   <profiles>
     <profile>
-      <id>multi-m</id>
-      <distributionManagement>
-        <repository>
-          <id>multi-m.releases</id>
-          <name>MULTI-M Releases</name>
-          <url>http://hudson:8081/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-          <id>multi-m.snapshots</id>
-          <name>MULTI-M Snapshots</name>
-          <url>http://hudson:8081/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-      </distributionManagement>
-    </profile>
-    <profile>
       <id>sonatype.oss.staging</id>
       <distributionManagement>
         <repository>
