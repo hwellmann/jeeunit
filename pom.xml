@@ -127,6 +127,7 @@
     <module>jeeunit-example</module>
     <module>jeeunit-weld-se</module>
     <module>jeeunit-glassfish</module>
+    <module>jeeunit-concurrent</module>
   </modules>
 
   <profiles>
