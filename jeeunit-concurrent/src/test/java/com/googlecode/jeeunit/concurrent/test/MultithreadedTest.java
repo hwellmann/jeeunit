@@ -20,9 +20,11 @@ package com.googlecode.jeeunit.concurrent.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.googlecode.jeeunit.concurrent.Concurrent;
 import com.googlecode.jeeunit.concurrent.ConcurrentRunner;
 
 @RunWith(ConcurrentRunner.class)
+@Concurrent(threads = 2)
 public class MultithreadedTest {
 
     private static final int MAX_LOOP = 5;
