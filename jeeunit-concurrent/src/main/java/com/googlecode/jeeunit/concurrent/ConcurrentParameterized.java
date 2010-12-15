@@ -19,6 +19,16 @@ package com.googlecode.jeeunit.concurrent;
 
 import org.junit.runners.Parameterized;
 
+/**
+ * An extension of the {@code Parameterized} JUnit Runner for running parameterized tests
+ * concurrently. The tests will be scheduled to an Executor with a thread pool. Use the
+ * {@code @Concurrent} annotation on the class to specify the number of threads.
+ * 
+ * See {@link ConcurrentRunner} and {@link Parameterized} for details.
+ * 
+ * @author hwellmann
+ * 
+ */
 public class ConcurrentParameterized extends Parameterized {
 
     public ConcurrentParameterized(Class<?> klass) throws Throwable {
