@@ -25,13 +25,13 @@ import com.googlecode.jeeunit.concurrent.ConcurrentRunner;
 import com.googlecode.jeeunit.concurrent.Repeat;
 
 @RunWith(ConcurrentRunner.class)
+@Repeat(times = 2)
 @Concurrent(threads = 10)
 public class RepeatedTest {
 
     private static final int MAX_LOOP = 5;
 
     @Test
-    @Repeat(times = 3)
     public void repeatedMethod() throws InterruptedException {
         for (int i = 0; i < MAX_LOOP; i++) {
             System.out.println(String.format("repeatedMethod: %d", i));
@@ -40,7 +40,7 @@ public class RepeatedTest {
     }
 
     @Test
-    @Repeat(times = 2)
+    @Repeat(times = 3)
     public void anotherRepeatedMethod() throws InterruptedException {
         for (int i = 0; i < MAX_LOOP; i++) {
             System.out.println(String.format("anotherRepeatedMethod: %d", i));

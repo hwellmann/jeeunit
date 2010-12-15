@@ -35,8 +35,7 @@ public class ConcurrentRunnerScheduler implements RunnerScheduler {
 
     public ConcurrentRunnerScheduler(Class<?> klass) {
         int numThreads = klass.isAnnotationPresent(Concurrent.class) ? klass
-                .getAnnotation(Concurrent.class).threads() : (int) (Runtime.getRuntime()
-                .availableProcessors() * 1.5);
+                .getAnnotation(Concurrent.class).threads() : 1;
         executorService = Executors.newFixedThreadPool(numThreads,
                 new NamedThreadFactory(klass.getSimpleName()));
         completionService = new ExecutorCompletionService<Void>(executorService);

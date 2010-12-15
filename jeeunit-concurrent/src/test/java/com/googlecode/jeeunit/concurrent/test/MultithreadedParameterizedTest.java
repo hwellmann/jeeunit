@@ -25,22 +25,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.googlecode.jeeunit.concurrent.Concurrent;
 import com.googlecode.jeeunit.concurrent.ConcurrentParameterized;
 
 @RunWith(ConcurrentParameterized.class)
+@Concurrent(threads = 4)
 public class MultithreadedParameterizedTest {
 
     private static final int MAX_LOOP = 5;
-    private int methodNum;
+    private int parameter;
 
-    public MultithreadedParameterizedTest(int methodNum) {
-        this.methodNum = methodNum;
+    public MultithreadedParameterizedTest(int parameter) {
+        this.parameter = parameter;
     }
 
     @Parameters
     public static Collection<Object[]> getParameters() {
         List<Object[]> parameters = new ArrayList<Object[]>(10);
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 2; i++) {
             parameters.add(new Object[] { i });
         }
         return parameters;
@@ -49,7 +51,7 @@ public class MultithreadedParameterizedTest {
     @Test
     public void runMethod() throws InterruptedException {
         for (int i = 0; i < MAX_LOOP; i++) {
-            System.out.println(String.format("method%d: %d", methodNum, i));
+            System.out.println(String.format("parameter=%d: %d", parameter, i));
             Thread.sleep(500);
         }
     }
