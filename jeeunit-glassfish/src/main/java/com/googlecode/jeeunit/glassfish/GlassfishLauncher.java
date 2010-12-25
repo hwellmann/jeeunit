@@ -1,4 +1,4 @@
-package com.googlecode.jeeunit.example.test.driver;
+package com.googlecode.jeeunit.glassfish;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

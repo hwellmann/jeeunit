@@ -1,4 +1,4 @@
-package com.googlecode.jeeunit.example.test.driver;
+package com.googlecode.jeeunit.glassfish;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
