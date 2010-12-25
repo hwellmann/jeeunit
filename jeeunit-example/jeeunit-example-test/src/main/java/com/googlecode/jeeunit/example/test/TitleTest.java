@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
-import com.googlecode.jeeunit.example.test.driver.JeeunitRunner;
+import com.googlecode.jeeunit.glassfish.JeeunitRunner;
 
 @RunWith(JeeunitRunner.class)
 public class TitleTest {

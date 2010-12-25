@@ -11,6 +11,12 @@
   <name>jeeunit Glassfish Driver</name>
   <dependencies>
     <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.extras</groupId>
       <artifactId>glassfish-embedded-all</artifactId>
       <scope>compile</scope>
