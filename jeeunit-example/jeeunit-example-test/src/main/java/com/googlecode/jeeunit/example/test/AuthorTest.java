@@ -32,10 +32,13 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
+import com.googlecode.jeeunit.example.test.driver.JeeunitRunner;
 
+@RunWith(JeeunitRunner.class)
 public class AuthorTest {
 
     @Inject

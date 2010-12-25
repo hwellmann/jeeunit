@@ -20,7 +20,7 @@ package com.googlecode.jeeunit.example.test.driver;
 import java.io.File;
 import java.io.IOException;
 
-import org.glassfish.api.embedded.LifecycleException;
+import org.glassfish.internal.embedded.LifecycleException;
 import org.junit.Test;
 
 import com.googlecode.jeeunit.glassfish.GlassfishTestDriver;
