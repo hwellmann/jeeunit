@@ -15,11 +15,11 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.glassfish.api.deployment.DeployCommandParameters;
-import org.glassfish.api.embedded.ContainerBuilder;
-import org.glassfish.api.embedded.EmbeddedDeployer;
-import org.glassfish.api.embedded.EmbeddedFileSystem;
-import org.glassfish.api.embedded.LifecycleException;
-import org.glassfish.api.embedded.Server;
+import org.glassfish.internal.embedded.ContainerBuilder;
+import org.glassfish.internal.embedded.EmbeddedDeployer;
+import org.glassfish.internal.embedded.EmbeddedFileSystem;
+import org.glassfish.internal.embedded.LifecycleException;
+import org.glassfish.internal.embedded.Server;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

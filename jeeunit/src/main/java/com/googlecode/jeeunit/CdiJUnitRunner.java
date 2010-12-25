@@ -27,8 +27,6 @@ import org.junit.runners.model.InitializationError;
 
 public class CdiJUnitRunner extends BlockJUnit4ClassRunner
 {
-
-    private static BeanManager mgr = BeanManagerLookup.getBeanManager();
     
     public CdiJUnitRunner(Class<?> klass) throws InitializationError
     {
@@ -43,9 +41,10 @@ public class CdiJUnitRunner extends BlockJUnit4ClassRunner
         return test;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void inject(Object test)
     {
+        BeanManager mgr = BeanManagerLookup.getBeanManager();
         AnnotatedType annotatedType = mgr.createAnnotatedType(test.getClass());
         InjectionTarget target = mgr.createInjectionTarget(annotatedType);
         CreationalContext context = mgr.createCreationalContext(null);
