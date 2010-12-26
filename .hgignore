@@ -14,3 +14,6 @@ pom.xml.releaseBackup
 
 
 
+
+syntax: regexp
+^jeeunit-example/jeeunit-example-arquillian$

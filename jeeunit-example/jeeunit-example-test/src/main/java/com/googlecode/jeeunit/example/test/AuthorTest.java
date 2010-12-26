@@ -34,9 +34,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.googlecode.jeeunit.JeeunitRunner;
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
-import com.googlecode.jeeunit.glassfish.JeeunitRunner;
 
 @RunWith(JeeunitRunner.class)
 public class AuthorTest {

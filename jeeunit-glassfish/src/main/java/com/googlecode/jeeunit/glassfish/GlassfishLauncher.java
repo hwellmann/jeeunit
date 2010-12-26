@@ -1,3 +1,19 @@
+/*
+ * Copyright 2010 Harald Wellmann
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
 package com.googlecode.jeeunit.glassfish;
 
 import static org.junit.Assert.assertEquals;
@@ -24,10 +40,11 @@ import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.googlecode.jeeunit.spi.ContainerLauncher;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
-public class GlassfishLauncher {
+public class GlassfishLauncher implements ContainerLauncher {
     
     private static GlassfishLauncher instance;
 
@@ -41,24 +58,13 @@ public class GlassfishLauncher {
     private WebResource webResource;
     
         
-    private GlassfishLauncher() {
+    public GlassfishLauncher() {
 
         File domainConfig = new File("src/test/resources/domain.xml");
         setConfiguration(domainConfig);
         
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
-
-        try {
-            launch();
-            addShutdownHook();
-        }
-        catch (GlassFishException e) {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
     
     public static synchronized GlassfishLauncher getInstance() {
@@ -121,12 +127,14 @@ public class GlassfishLauncher {
         this.configuration = configuration;
     }
 
-    public WebResource getWebResource() {
+    public WebResource getTestRunner() {
         return webResource;
     }
     
     
-    private void launch() throws GlassFishException, IOException {
+    public void launch() {
+        addShutdownHook();
+
         String classpath = System.getProperty("java.class.path");       
 
         // Define your JDBC resources and JNDI names in this config file
@@ -135,13 +143,21 @@ public class GlassfishLauncher {
 
         GlassFishProperties gfProps = new GlassFishProperties();
         gfProps.setConfigFileURI(domainConfig.toURI().toString());
-        
+        try {
+            
         glassFish = GlassFishRuntime.bootstrap().newGlassFish(gfProps);
         glassFish.start();
                 
         URI warUri = buildWar(classpath);
         deployWar(warUri);        
         createWebClient();
+        }
+        catch (IOException exc) {
+            throw new RuntimeException(exc);
+        }
+        catch (GlassFishException exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
     private URI buildWar(String classpath) throws IOException {

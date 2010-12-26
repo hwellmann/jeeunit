@@ -1,4 +1,23 @@
-package com.googlecode.jeeunit.glassfish;
+/*
+ * Copyright 2010 Harald Wellmann
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+package com.googlecode.jeeunit;
+
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -17,17 +36,19 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
-import com.googlecode.jeeunit.BeanManagerLookup;
+import com.googlecode.jeeunit.spi.ContainerLauncher;
 import com.sun.jersey.api.client.WebResource;
 
 public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
-    private GlassfishLauncher launcher;
+    private ContainerLauncher launcher;
 
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
+        System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
         if (!isEmbedded()) {
-            launcher = GlassfishLauncher.getInstance();
+            launcher = findLauncher();
+            launcher.launch();
         }
     }
 
@@ -43,10 +64,9 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
             eachNotifier.fireTestStarted();
             try {
-                WebResource webResource = launcher.getWebResource();
-                String result = webResource.queryParam("class", getTestClass().getName()).
-                    queryParam("method", method.getName()).
-                    get(String.class);
+                WebResource webResource = launcher.getTestRunner();
+                String result = webResource.queryParam("class", getTestClass().getName())
+                        .queryParam("method", method.getName()).get(String.class);
                 Assert.assertTrue(result.contains("All tests passed"));
             }
             catch (AssumptionViolatedException e) {
@@ -96,8 +116,19 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
             InitialContext ctx = new InitialContext();
             return ctx.lookup(BEAN_MANAGER_JNDI) != null;
         }
-        catch (NamingException e) {
+        catch (NamingException exc) {
             return false;
         }
+    }
+
+    private ContainerLauncher findLauncher() {
+        ContainerLauncher launcher = null;
+        ServiceLoader<ContainerLauncher> loader = ServiceLoader.load(ContainerLauncher.class);
+        Iterator<ContainerLauncher> it = loader.iterator();
+
+        while (launcher == null && it.hasNext()) {
+            launcher = it.next();
+        }
+        return launcher;
     }
 }
