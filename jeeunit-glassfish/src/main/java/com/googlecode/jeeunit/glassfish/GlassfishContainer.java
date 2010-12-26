@@ -174,7 +174,9 @@ public class GlassfishContainer {
                 continue;
             
             File file = new File(pathElem);
-            sar.addClassPath(file);
+            if (file.exists()) {
+                sar.addClassPath(file);
+            }
         }
         sar.addMetadata(new File("src/main/webapp/WEB-INF", "beans.xml"));
         URI warUri = sar.toURI();
