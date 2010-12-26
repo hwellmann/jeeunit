@@ -6,6 +6,11 @@
   <packaging>pom</packaging>
   <name>jeeunit Parent</name>
   <description>Integration Testing for Java EE 6</description>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>5</version>
+  </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hibernate.version>3.5.1-Final</hibernate.version>
