@@ -16,6 +16,9 @@
  */
 package com.googlecode.jeeunit;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -26,7 +29,6 @@ import javax.enterprise.inject.spi.InjectionTarget;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.internal.runners.model.EachTestNotifier;
@@ -64,16 +66,19 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
             eachNotifier.fireTestStarted();
             try {
-                WebResource webResource = launcher.getTestRunner();
-                String result = webResource.queryParam("class", getTestClass().getName())
-                        .queryParam("method", method.getName()).get(String.class);
-                Assert.assertTrue(result.contains("All tests passed"));
+                Throwable result = getRemoteTestResult(method);
+                if (result instanceof AssumptionViolatedException) {
+                    eachNotifier.addFailedAssumption((AssumptionViolatedException) result);                    
+                }
+                else if (result != null) {
+                    eachNotifier.addFailure(result);
+                }
             }
-            catch (AssumptionViolatedException e) {
-                eachNotifier.addFailedAssumption(e);
+            catch (IOException exc) {
+                eachNotifier.addFailure(exc);
             }
-            catch (Throwable e) {
-                eachNotifier.addFailure(e);
+            catch (ClassNotFoundException exc) {
+                eachNotifier.addFailure(exc);
             }
             finally {
                 eachNotifier.fireTestFinished();
@@ -82,6 +87,25 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         else {
             super.runChild(method, notifier);
         }
+    }
+
+    private Throwable getRemoteTestResult(FrameworkMethod method) throws IOException,
+            ClassNotFoundException {
+        WebResource webResource = launcher.getTestRunner();
+        InputStream is = webResource
+            .queryParam("class", getTestClass().getName())
+            .queryParam("method", method.getName())
+            .get(InputStream.class);
+        
+        ObjectInputStream ois = new ObjectInputStream(is);
+        Object object = ois.readObject();
+        if (object instanceof Throwable) {
+            return (Throwable) object;
+        }
+        else if (object instanceof String) {
+            return null;
+        }
+        throw new IllegalStateException();
     }
 
     private EachTestNotifier makeNotifier(FrameworkMethod method, RunNotifier notifier) {

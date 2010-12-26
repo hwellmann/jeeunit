@@ -18,10 +18,12 @@
 package com.googlecode.jeeunit;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +34,6 @@ import org.junit.runner.Request;
 import org.junit.runner.notification.Failure;
 
 import com.googlecode.jeeunit.report.FailureCollector;
-import com.googlecode.jeeunit.report.XmlFormatter;
 
 @WebServlet(urlPatterns = "/testrunner")
 public class TestRunnerServlet extends HttpServlet {
@@ -44,30 +45,28 @@ public class TestRunnerServlet extends HttpServlet {
         String methodName = request.getParameter("method");
         try {
             Class<?> clazz = getClass().getClassLoader().loadClass(className);
-            response.setContentType("text/plain");
-            PrintWriter writer = response.getWriter();
-            writer.println("Running test suite....");
-            runSuite(writer, clazz, methodName);
-            writer.println("Test suite completed");
-            writer.close();
+            response.setContentType("application/octet-stream");
+            ServletOutputStream os = response.getOutputStream();
+            runSuite(os, clazz, methodName);
+            os.flush();
         }
         catch (ClassNotFoundException exc) {
-            throw new ServletException(exc);
+            throw new ServletException("cannot load test class " + className, exc);
         }
     }
 
-    protected void runSuite(PrintWriter writer, Class<?> clazz, String methodName) {
+    protected void runSuite(OutputStream os, Class<?> clazz, String methodName) throws IOException {
         JUnitCore core = new JUnitCore();
-        XmlFormatter formatter = new XmlFormatter();
         FailureCollector collector = new FailureCollector();
-        core.addListener(formatter);
         core.addListener(collector);
         core.run(Request.method(clazz, methodName));
         List<Failure> failures = collector.getFailures();
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        for (Failure failure : failures) {
+            oos.writeObject(failure.getException());
+        }
         if (failures.isEmpty()) {
-            writer.println("All tests passed");
-        } else {
-            writer.println(failures.size() + " test failures");
+            oos.writeObject("ok");
         }
     }
 }
