@@ -8,6 +8,7 @@
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-fit</artifactId>
+  <name>jeeunit FIT Port</name>
   <version>0.7.0.SNAPSHOT</version>
   <dependencies>
     <dependency>
@@ -22,6 +23,8 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <description>A slightly modified version of the Framework for Integration Testing (FIT), 
+    based on https://github.com/unclebob/fitnesse/zipball/20101101.</description>
   <build>
     <plugins>
       <plugin>
