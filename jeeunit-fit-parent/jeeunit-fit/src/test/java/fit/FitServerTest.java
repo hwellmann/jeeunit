@@ -326,8 +326,9 @@ public class FitServerTest {
     return response;
   }
 
+  // hwellmann: modified to work with Maven build
   protected String command() {
-    return "java -cp classes fit.FitServer";
+    return "java -cp target/classes:target/test-classes fit.FitServer";
   }
 
   protected String simpleTable(String fixtureName) {
