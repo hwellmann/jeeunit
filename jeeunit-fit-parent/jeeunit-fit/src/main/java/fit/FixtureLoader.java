@@ -62,7 +62,15 @@ public class FixtureLoader {
     return fixtureClass.newInstance();
   }
 
-  private Class<?> loadFixtureClass(String fixtureName) {
+  /**
+   * Loads a fixture class for the given class name.
+   * hwellmann: Made this protected so that derived classes can override this method
+   * for supplying their own classloader.
+   * 
+   * @param fixtureName  fixture class name
+   * @return fixture class
+   */
+  protected Class<?> loadFixtureClass(String fixtureName) {
     try {
       return Class.forName(fixtureName);
     }
