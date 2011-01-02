@@ -11,14 +11,14 @@ public class MusicLibrary {
     static Music library[] = {};
 
     static void load(String name) throws Exception {
-        List music = new ArrayList();
+        List<Music> music = new ArrayList<Music>();
         BufferedReader in = new BufferedReader(new FileReader(name));
         in.readLine(); // skip column headings
         while(in.ready()) {
             music.add(Music.parse(in.readLine()));
         }
         in.close();
-        library = (Music[])music.toArray(library);
+        library = music.toArray(library);
     }
 
     static void select(Music m) {
