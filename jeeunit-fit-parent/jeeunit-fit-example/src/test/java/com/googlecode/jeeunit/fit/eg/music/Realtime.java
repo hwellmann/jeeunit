@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class Realtime extends TimedActionFixture {
 
-    Simulator system = Simulator.system;
+    Simulator system = Simulator.reset();
 
     public Date time () {
         return new Date(Simulator.time);
@@ -39,9 +39,8 @@ public class Realtime extends TimedActionFixture {
 
     private void system(String prefix, Parse cell) throws Exception {
         String method = camel(prefix+" "+cell.text());
-        Class[] empty = {};
         try {
-            system.getClass().getMethod(method,empty).invoke(system,empty);
+            system.getClass().getMethod(method).invoke(system);
         } catch (Exception e) {
             exception (cell, e);
         }

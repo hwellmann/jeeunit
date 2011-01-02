@@ -67,5 +67,10 @@ public class Simulator {
         ActionFixture.actor = new Dialog("load jamed", ActionFixture.actor);
     }
 
+    public static Simulator reset() {
+        time = new Date().getTime();
+        system = new Simulator();
+        return system;
+    }
 
 }
