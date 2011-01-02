@@ -15,7 +15,7 @@ public class Display extends fit.RowFixture {
     @Inject
     private MusicLibrary musicLibrary;
 
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return Music.class;
     }
 
@@ -23,7 +23,7 @@ public class Display extends fit.RowFixture {
         return musicLibrary.displayContents();
     }
 
-    public Object parse (String s, Class type) throws Exception {
+    public Object parse (String s, Class<?> type) throws Exception {
         if (type.equals(Date.class))    {return Music.dateFormat.parse(s);}
         return super.parse (s, type);
     }
