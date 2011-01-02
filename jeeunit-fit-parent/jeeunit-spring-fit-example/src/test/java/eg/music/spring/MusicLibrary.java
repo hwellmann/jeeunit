@@ -22,7 +22,7 @@ public class MusicLibrary {
     Music library[] = {};
 
     void load(String name) throws Exception {
-        List music = new ArrayList();
+        List<Music> music = new ArrayList<Music>();
         BufferedReader in = new BufferedReader(new FileReader(name));
         in.readLine(); // skip column headings
         while(in.ready()) {
