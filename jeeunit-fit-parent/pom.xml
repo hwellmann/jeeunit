@@ -13,6 +13,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>jeeunit-fit</module>
+    <module>jeeunit-fit-junit</module>
     <module>jeeunit-fit-example</module>
     <module>jeeunit-spring-fit-example</module>
   </modules>
