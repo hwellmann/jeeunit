@@ -1,7 +1,7 @@
 // Copyright (c) 2002 Cunningham & Cunningham, Inc.
 // Read license.txt in this directory.
 
-package eg.music.spring;
+package com.googlecode.jeeunit.fit.eg.music.spring;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

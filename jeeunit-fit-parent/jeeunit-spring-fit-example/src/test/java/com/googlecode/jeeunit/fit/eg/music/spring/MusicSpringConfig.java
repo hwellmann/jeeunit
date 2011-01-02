@@ -1,4 +1,4 @@
-package eg.music.spring;
+package com.googlecode.jeeunit.fit.eg.music.spring;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
