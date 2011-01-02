@@ -205,6 +205,7 @@ public class FitRunnerMojo extends AbstractMojo {
     }
 
     protected void run(File in, File out) throws IOException, ParseException {
+        ensureParentDirExists(out);
         getLog().info(
                 "Running Fixture with input file " + in.getPath() + " and output file "
                         + out.getPath());
@@ -257,4 +258,18 @@ public class FitRunnerMojo extends AbstractMojo {
         in.close();
         return sb.toString();
     }
+    
+    private void ensureParentDirExists(File outputFile) throws IOException {
+        File parentDir = outputFile.getParentFile();
+        if (parentDir.exists()) {
+            if (!parentDir.isDirectory()) {
+                throw new IOException(parentDir + " is not a directory");
+            }
+        }
+        else if (!parentDir.mkdirs()) {
+            throw new IOException("cannot create " + parentDir);
+        }
+    }
+    
+    
 }
