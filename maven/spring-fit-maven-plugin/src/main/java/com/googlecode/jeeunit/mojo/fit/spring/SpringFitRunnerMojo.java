@@ -16,10 +16,12 @@
  */
 package com.googlecode.jeeunit.mojo.fit.spring;
 
+import org.springframework.test.context.ContextConfiguration;
+
+import com.googlecode.jeeunit.fit.junit.spring.SpringFixtureLoader;
 import com.googlecode.jeeunit.mojo.fit.ClasspathClassLoader;
 import com.googlecode.jeeunit.mojo.fit.FitRunnerMojo;
 
-import fit.Fixture;
 import fit.FixtureLoader;
 
 /**
