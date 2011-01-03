@@ -11,12 +11,12 @@ public class TypeAdapter {
     public Fixture fixture;
     public Field field;
     public Method method;
-    public Class type;
+    public Class<?> type;
 
 
     // Factory //////////////////////////////////
 
-    public static TypeAdapter on(Fixture target, Class type) {
+    public static TypeAdapter on(Fixture target, Class<?> type) {
         TypeAdapter a = adapterFor(type);
         a.init(target, type);
         return a;
@@ -36,7 +36,7 @@ public class TypeAdapter {
         return a;
     }
 
-    public static TypeAdapter adapterFor(Class type) throws UnsupportedOperationException {
+    public static TypeAdapter adapterFor(Class<?> type) throws UnsupportedOperationException {
         if (type.isPrimitive()) {
 
             if (type.equals(byte.class)) return new ByteAdapter();
@@ -65,7 +65,7 @@ public class TypeAdapter {
 
     // Accessors ////////////////////////////////
 
-    protected void init (Fixture fixture, Class type) {
+    protected void init (Fixture fixture, Class<?> type) {
         this.fixture = fixture;
         this.type = type;
     }
@@ -209,10 +209,10 @@ public class TypeAdapter {
     }
 
     static class ArrayAdapter extends TypeAdapter {
-        Class componentType;
+        Class<?> componentType;
         TypeAdapter componentAdapter;
 
-        protected void init(Fixture target, Class type) {
+        protected void init(Fixture target, Class<?> type) {
             super.init(target, type);
             componentType = type.getComponentType();
             componentAdapter = on(target, componentType);
