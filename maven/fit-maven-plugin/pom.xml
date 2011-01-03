@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit-fit</artifactId>
+      <artifactId>jeeunit-fit-unclebob</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
