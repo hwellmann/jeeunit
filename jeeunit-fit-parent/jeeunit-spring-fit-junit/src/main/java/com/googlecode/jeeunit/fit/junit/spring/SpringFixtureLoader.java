@@ -32,20 +32,26 @@ import fit.FixtureLoader;
 public class SpringFixtureLoader extends FixtureLoader {
 
     /**
-     * Loads a fixtures class, creates an instance and performs Spring dependency injection
+     * Creates an instance of a fixture class and performs Spring dependency injection
      * if class is annotated with {@link ContextConfiguration}.
      * 
      * @param fixtureClassName name of fixture class
      */
     @Override
-    public Fixture disgraceThenLoad(String fixtureClassName) throws Throwable {
-        Fixture fixture = super.disgraceThenLoad(fixtureClassName);
-        Class<? extends Fixture> clazz = fixture.getClass();
-        ContextConfiguration cc = clazz.getAnnotation(ContextConfiguration.class);
+    public Fixture createFixture(Class<?> klass) throws InstantiationException,
+            IllegalAccessException {
+        Fixture fixture = (Fixture) klass.newInstance();
+
+        ContextConfiguration cc = klass.getAnnotation(ContextConfiguration.class);
         if (cc != null) {
-            TestContextManager contextManager = new TestContextManager(clazz);
-            contextManager.prepareTestInstance(fixture);
+            TestContextManager contextManager = new TestContextManager(klass);
+            try {
+                contextManager.prepareTestInstance(fixture);
+            }
+            catch (Exception exc) {
+                throw new InstantiationException("dependency injection failed for " + klass.getName());
+            }
         }
         return fixture;
-    }
+    }    
 }
