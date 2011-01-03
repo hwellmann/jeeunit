@@ -16,11 +16,9 @@
  */
 package com.googlecode.jeeunit.mojo.fit.spring;
 
-import org.springframework.test.context.ContextConfiguration;
-
 import com.googlecode.jeeunit.mojo.fit.FitRunnerMojo;
 
-import fit.FixtureLoader;
+import fit.Fixture;
 
 /**
  * Mojo to run FIT tests which supports Spring dependency injection for fixtures.
@@ -42,15 +40,9 @@ import fit.FixtureLoader;
  */
 public class SpringFitRunnerMojo extends FitRunnerMojo {
 
-    /**
-     * Returns a fixture loader which performs dependency injection on the loaded fixture
-     * instances.
-     * 
-     * @return fixture loader
-     */
     @Override
-    protected FixtureLoader getFixtureLoader() {
-        return new SpringFixtureLoader(getTestClassLoader());
+    protected Fixture createFixture() {
+    	return new SpringFixture();
     }
 
 }

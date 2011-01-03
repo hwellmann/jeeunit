@@ -1,6 +1,5 @@
 package com.googlecode.jeeunit.mojo.fit;
 
-import static java.lang.Thread.currentThread;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -21,8 +20,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.DirectoryScanner;
 
 import fit.Fixture;
-import fit.FixtureLoader;
 import fit.Parse;
+import static java.lang.Thread.currentThread;
 
 /**
  * Mojo to run Fit tests via a Fixture
@@ -135,13 +134,8 @@ public class FitRunnerMojo extends AbstractMojo {
     }
 
     protected Fixture createFixture() {
-        FixtureLoader.setInstance(getFixtureLoader());
         Fixture fixture = new Fixture();
         return fixture;
-    }
-
-    protected FixtureLoader getFixtureLoader() {
-        return new ClassLoaderFixtureLoader(getTestClassLoader());
     }
 
     protected ClasspathClassLoader getTestClassLoader() {

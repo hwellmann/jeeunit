@@ -17,5 +17,6 @@
     <module>jeeunit-fit-example</module>
     <module>jeeunit-spring-fit-example</module>
     <module>jeeunit-spring-fit-junit</module>
+    <module>jeeunit-fit-c2</module>
   </modules>
 </project>
