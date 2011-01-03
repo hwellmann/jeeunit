@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit-fit-c2</artifactId>
+      <artifactId>jeeunit-fit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -51,7 +51,6 @@
         </configuration>
         <executions>
           <execution>
-            <phase>integration-test</phase>
             <goals>
               <goal>run</goal>
             </goals>
