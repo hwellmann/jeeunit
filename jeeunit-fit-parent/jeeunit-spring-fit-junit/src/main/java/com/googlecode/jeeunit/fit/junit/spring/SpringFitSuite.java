@@ -17,7 +17,6 @@
 package com.googlecode.jeeunit.fit.junit.spring;
 
 import org.junit.runners.model.InitializationError;
-import org.springframework.test.context.ContextConfiguration;
 
 import com.googlecode.jeeunit.fit.junit.FitSuite;
 
@@ -60,7 +59,6 @@ public class SpringFitSuite extends FitSuite {
     public SpringFitSuite(Class<?> klass) throws InitializationError {
         super(klass);
         
-        FixtureLoader.setInstance(new SpringFixtureLoader());
+        FixtureLoader.setInstance(new SpringTestContextFixtureLoader());
     }
-
 }

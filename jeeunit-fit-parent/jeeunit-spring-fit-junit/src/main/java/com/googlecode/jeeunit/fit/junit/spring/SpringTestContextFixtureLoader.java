@@ -29,7 +29,7 @@ import fit.FixtureLoader;
  * @author Harald Wellmann
  *
  */
-public class SpringFixtureLoader extends FixtureLoader {
+public class SpringTestContextFixtureLoader extends FixtureLoader {
 
     /**
      * Creates an instance of a fixture class and performs Spring dependency injection
