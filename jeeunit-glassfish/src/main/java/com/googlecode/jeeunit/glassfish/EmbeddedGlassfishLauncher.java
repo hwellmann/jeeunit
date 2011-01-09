@@ -64,4 +64,9 @@ public class EmbeddedGlassfishLauncher implements ContainerLauncher {
     public void addMetadata(File file) {
         container.addMetadata(file);
     }
+
+    @Override
+    public URI getContextRootUri() {
+        return container.getContextRootUri();
+    }
 }

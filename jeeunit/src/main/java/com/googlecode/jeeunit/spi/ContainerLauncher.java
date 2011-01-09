@@ -60,4 +60,10 @@ public interface ContainerLauncher {
      * @param file
      */
     void addMetadata(File file);
+    
+    /**
+     * Returns the slash-terminated context root URI of the deployed web application.
+     * @return root URI
+     */
+    URI getContextRootUri();    
 }
