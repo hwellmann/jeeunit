@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Harald Wellmann
+ * Copyright 2011 Harald Wellmann
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
  */
 package com.googlecode.jeeunit.glassfish;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,35 +41,70 @@ import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+import com.googlecode.jeeunit.spi.ContainerLauncher;
 
-public class GlassfishContainer {
+/**
+ * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Glassfish.
+ * 
+ * @author hwellmann
+ *
+ */
+public class EmbeddedGlassfishContainer {
     
-    private static GlassfishContainer instance;
+    private static EmbeddedGlassfishContainer instance;
 
     private GlassFish glassFish;
-
+    private FileFilter classpathFilter;
     
     private String applicationName;
     private String contextRoot;
     private File configuration;
-
-    private WebResource webResource;
+    private boolean isDeployed;
     
+    private List<File> metadataFiles = new ArrayList<File>();
+
+    /**
+     * Default filter suppressing Glassfish and Eclipse components from the classpath when 
+     * building the ad hoc WAR.
+     * 
+     * @author hwellmann
+     *
+     */
+    private static class DefaultClasspathFilter implements FileFilter {
+
+        @Override
+        public boolean accept(File pathname) {
+            String path = pathname.getPath();
+            if (path.contains("glassfish-embedded"))
+                return false;
+
+            // this is to filter all bundles deployed to the Eclipse runtime, e.g. the JUnit
+            // integration
+            return !path.contains("org.eclipse.osgi");            
+        }        
+    }
         
-    public GlassfishContainer() {
+    private EmbeddedGlassfishContainer() {
 
         File domainConfig = new File("src/test/resources/domain.xml");
         setConfiguration(domainConfig);
         
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
+        setClasspathFilter(new DefaultClasspathFilter());
+        
+        createDefaultMetadata();
     }
     
-    public static synchronized GlassfishContainer getInstance() {
+    private void createDefaultMetadata() {
+        File webInf = new File("src/main/webapp/WEB-INF");
+        metadataFiles.add(new File(webInf, "web.xml"));
+        metadataFiles.add(new File(webInf, "beans.xml"));
+    }
+
+    public static synchronized EmbeddedGlassfishContainer getInstance() {
         if (instance == null) {
-            instance = new GlassfishContainer();
+            instance = new EmbeddedGlassfishContainer();
         }
         return instance;
     }
@@ -77,15 +113,7 @@ public class GlassfishContainer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                try {
-                    if (glassFish != null) {
-                        glassFish.getDeployer().undeploy(getApplicationName());
-                        glassFish.stop();
-                    }
-                }
-                catch (GlassFishException exc) {
-                    throw new RuntimeException(exc);
-                }
+                shutdown();
             }
         });
     }
@@ -126,8 +154,8 @@ public class GlassfishContainer {
         this.configuration = configuration;
     }
 
-    public WebResource getTestRunner() {
-        return webResource;
+    public void setClasspathFilter(FileFilter classpathFilter) {
+        this.classpathFilter = classpathFilter;
     }
     
     
@@ -135,50 +163,45 @@ public class GlassfishContainer {
         if (glassFish != null) {
             return;
         }
-        
+
+        /*
+         * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
+         * notified when Eclipse is finished running the test suite. The shutdown hook is just
+         * to be on the safe side.
+         */
         addShutdownHook();
 
-        String classpath = System.getProperty("java.class.path");       
-
-        // Define your JDBC resources and JNDI names in this config file
         File domainConfig = getConfiguration();
-        assertTrue(domainConfig + " not found", domainConfig.exists());
+        if (!domainConfig.exists()) {
+            throw new IllegalArgumentException(domainConfig + " not found");
+        }
 
         GlassFishProperties gfProps = new GlassFishProperties();
         gfProps.setConfigFileURI(domainConfig.toURI().toString());
+
         try {
-            
-        glassFish = GlassFishRuntime.bootstrap().newGlassFish(gfProps);
-        glassFish.start();
-                
-        URI warUri = buildWar(classpath);
-        deployWar(warUri);        
-        createWebClient();
-        }
-        catch (IOException exc) {
-            throw new RuntimeException(exc);
+            glassFish = GlassFishRuntime.bootstrap().newGlassFish(gfProps);
+            glassFish.start();
         }
         catch (GlassFishException exc) {
             throw new RuntimeException(exc);
         }
     }
 
-    private URI buildWar(String classpath) throws IOException {
-        ScatteredArchive sar= new ScatteredArchive("mywar", Type.WAR);        
+    private URI buildWar() throws IOException {
+        String classpath = System.getProperty("java.class.path");       
+        ScatteredArchive sar= new ScatteredArchive("jeeunit-autodeploy", Type.WAR);        
         String[] pathElems = classpath.split(File.pathSeparator);
+
         for (String pathElem : pathElems) {
-            if (pathElem.contains("glassfish-embedded"))
-                continue;
-            
-            if (pathElem.contains("org.eclipse.osgi"))
-                continue;
-            
             File file = new File(pathElem);
-            if (file.exists()) {
+            if (file.exists() && classpathFilter.accept(file)) {
                 sar.addClassPath(file);
             }
         }
-        sar.addMetadata(new File("src/main/webapp/WEB-INF", "beans.xml"));
+        for (File metadata : metadataFiles) {
+            sar.addMetadata(metadata);
+        }
         URI warUri = sar.toURI();
         return warUri;
     }
@@ -188,14 +211,9 @@ public class GlassfishContainer {
         String appName = deployer.deploy(warUri, 
                 "--name", getApplicationName(),
                 "--contextroot", getContextRoot());
-        assertEquals("error deploying WAR", getApplicationName(), appName) ;
-    }
-
-    private void createWebClient() {
-        String port = getPortNumber(configuration);
-        Client client = Client.create();
-        String url = "http://localhost:" + port + "/" + getContextRoot() + "/testrunner";
-        webResource = client.resource(url);
+        if (! getApplicationName().equals(appName)) {
+            throw new RuntimeException("error deploying WAR");
+        }
     }
 
     /**
@@ -228,5 +246,43 @@ public class GlassfishContainer {
         }
     }
 
+    public void shutdown() {
+        try {
+            if (glassFish != null) {
+                glassFish.getDeployer().undeploy(getApplicationName());
+                glassFish.stop();
+            }
+        }
+        catch (GlassFishException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    public URI autodeploy() {
+        try {
+            if (!isDeployed) {
+                URI warUri = buildWar();
+                deployWar(warUri);
+                isDeployed = true;
+            }
+            return getContextRootUri();
+        }
+        catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
     
+    public URI getContextRootUri() {
+        String port = getPortNumber(configuration);
+        try {
+            return new URI(String.format("http://localhost:%s/%s/", port, getContextRoot()));
+        }
+        catch (URISyntaxException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    public void addMetadata(File file) {
+        metadataFiles.add(file);
+    }
 }

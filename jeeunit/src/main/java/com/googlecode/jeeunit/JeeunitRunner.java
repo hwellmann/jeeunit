@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Harald Wellmann
+ * Copyright 2011 Harald Wellmann
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.googlecode.jeeunit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -39,11 +40,13 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 import com.googlecode.jeeunit.spi.ContainerLauncher;
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
     private ContainerLauncher launcher;
+    private WebResource testRunner;
 
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -51,6 +54,8 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         if (!isEmbedded()) {
             launcher = findLauncher();
             launcher.launch();
+            URI contextRoot = launcher.autodeploy();
+            testRunner = getTestRunner(contextRoot);            
         }
     }
 
@@ -91,8 +96,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
     private Throwable getRemoteTestResult(FrameworkMethod method) throws IOException,
             ClassNotFoundException {
-        WebResource webResource = launcher.getTestRunner();
-        InputStream is = webResource
+        InputStream is = testRunner
             .queryParam("class", getTestClass().getName())
             .queryParam("method", method.getName())
             .get(InputStream.class);
@@ -106,6 +110,13 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
             return null;
         }
         throw new IllegalStateException();
+    }
+    
+    private WebResource getTestRunner(URI contextRoot) {
+        URI uri = contextRoot.resolve("testrunner");
+        Client client = Client.create();
+        return client.resource(uri);
+        
     }
 
     private EachTestNotifier makeNotifier(FrameworkMethod method, RunNotifier notifier) {

@@ -1,1 +1,1 @@
-com.googlecode.jeeunit.glassfish.GlassfishLauncher
+com.googlecode.jeeunit.glassfish.EmbeddedGlassfishLauncher
