@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URI;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -52,7 +50,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         super(klass);
         System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
         if (!isEmbedded()) {
-            launcher = findLauncher();
+            launcher = ContainerLauncherLookup.getContainerLauncher();
             launcher.launch();
             URI contextRoot = launcher.autodeploy();
             testRunner = getTestRunner(contextRoot);            
@@ -154,16 +152,5 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         catch (NamingException exc) {
             return false;
         }
-    }
-
-    private ContainerLauncher findLauncher() {
-        ContainerLauncher launcher = null;
-        ServiceLoader<ContainerLauncher> loader = ServiceLoader.load(ContainerLauncher.class);
-        Iterator<ContainerLauncher> it = loader.iterator();
-
-        while (launcher == null && it.hasNext()) {
-            launcher = it.next();
-        }
-        return launcher;
     }
 }
