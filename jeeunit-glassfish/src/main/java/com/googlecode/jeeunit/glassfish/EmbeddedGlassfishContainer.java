@@ -177,7 +177,9 @@ public class EmbeddedGlassfishContainer {
         }
 
         GlassFishProperties gfProps = new GlassFishProperties();
-        gfProps.setConfigFileURI(domainConfig.toURI().toString());
+        if (domainConfig.exists()) {
+            gfProps.setConfigFileURI(domainConfig.toURI().toString());
+        }
 
         try {
             glassFish = GlassFishRuntime.bootstrap().newGlassFish(gfProps);
@@ -200,7 +202,9 @@ public class EmbeddedGlassfishContainer {
             }
         }
         for (File metadata : metadataFiles) {
-            sar.addMetadata(metadata);
+            if (metadata.exists()) {
+                sar.addMetadata(metadata);
+            }
         }
         URI warUri = sar.toURI();
         return warUri;
@@ -251,6 +255,7 @@ public class EmbeddedGlassfishContainer {
             if (glassFish != null) {
                 glassFish.getDeployer().undeploy(getApplicationName());
                 glassFish.stop();
+                glassFish = null;
             }
         }
         catch (GlassFishException exc) {
