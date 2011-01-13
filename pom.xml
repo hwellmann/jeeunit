@@ -21,6 +21,12 @@
   </properties>
   <url>http://code.google.com/p/jeeunit/</url>
   <inceptionYear>2010</inceptionYear>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url> 
+    </license>
+  </licenses>
   <scm>
     <connection>scm:hg:https://jeeunit.googlecode.com/hg</connection>
     <developerConnection>scm:hg:https://jeeunit.googlecode.com/hg</developerConnection>
