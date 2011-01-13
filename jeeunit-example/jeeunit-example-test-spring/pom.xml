@@ -62,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.derby</groupId>
-      <artifactId>derbyclient</artifactId>
+      <artifactId>derby</artifactId>
       <type>jar</type>
       <scope>test</scope>
     </dependency>

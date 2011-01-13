@@ -53,11 +53,11 @@ public class PersistenceContextProvider {
     private void createEntityManager() {
         Map<String, String> props = new HashMap<String, String>();
         props.put("javax.persistence.jdbc.driver",
-                "org.apache.derby.jdbc.ClientDriver");
+                "org.apache.derby.jdbc.EmbeddedDriver");
         props.put("javax.persistence.jdbc.url",
-                "jdbc:derby://localhost/sun-appserv-samples;create=true");
-        props.put("javax.persistence.jdbc.user", "APP");
-        props.put("javax.persistence.jdbc.password", "APP");
+                "jdbc:derby:target/jeeunitDb;create=true");
+        props.put("javax.persistence.jdbc.user", "jeeunit");
+        props.put("javax.persistence.jdbc.password", "jeeunit");
         props.put("hibernate.hbm2ddl.auto", "create");
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(
