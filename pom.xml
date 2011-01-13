@@ -185,5 +185,6 @@
     <module>jeeunit-weld-se</module>
     <module>jeeunit-glassfish</module>
     <module>jeeunit-concurrent</module>
+    <module>jeeunit-assembly</module>
   </modules>
 </project>
