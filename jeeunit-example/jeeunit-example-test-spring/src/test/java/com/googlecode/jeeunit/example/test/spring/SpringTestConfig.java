@@ -38,8 +38,8 @@ public class SpringTestConfig {
 
     @Bean
     public DataSource dataSource() {
-        return new SimpleDriverDataSource(new org.apache.derby.jdbc.ClientDriver(),
-                "jdbc:derby://localhost/sun-appserv-samples;create=true");
+        return new SimpleDriverDataSource(new org.apache.derby.jdbc.EmbeddedDriver(),
+                "jdbc:derby:target/jeeunitDb;create=true");
     }
 
     @Bean
