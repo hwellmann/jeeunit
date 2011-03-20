@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.jeeunit</groupId>
   <version>0.8.0.SNAPSHOT</version>
@@ -23,7 +24,7 @@
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url> 
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
     </license>
   </licenses>
   <scm>
@@ -73,7 +74,7 @@
       <dependency>
         <groupId>org.glassfish.extras</groupId>
         <artifactId>glassfish-embedded-all</artifactId>
-        <version>3.1-b33</version>
+        <version>3.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -197,4 +198,13 @@
     <module>jeeunit-concurrent</module>
     <module>jeeunit-assembly</module>
   </modules>
+
+  <repositories>
+    <repository>
+      <id>glassfish</id>
+      <name>Glassfish</name>
+      <url>http://download.java.net/maven/glassfish</url>
+    </repository>
+  </repositories>
+  
 </project>
