@@ -35,4 +35,8 @@
     <appender-ref ref="STDOUT"/>
     <appender-ref ref="TEST_LOG"/>
   </root>
+  
+  <logger name="javax.enterprise.system.container.ejb" level="INFO"/>
+  <logger name="javax.enterprise.system.core.transaction" level="INFO"/>
+  <logger name="javax.enterprise.resource.jta" level="DEBUG"/>
 </configuration>

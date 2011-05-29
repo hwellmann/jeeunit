@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -101,10 +102,27 @@ public class LibraryService implements Serializable {
     }
     
     @TransactionAttribute
+    public void createAuthor(String firstName, String lastName)
+    {
+        Author author = new Author();
+        author.setFirstName(firstName);
+        author.setLastName(lastName);
+        em.persist(author);
+    }
+    
+    @TransactionAttribute
     public long getNumBooks()
     {
         String jpql = "select count(b) from Book b";
         Long numBooks = (Long) em.createQuery(jpql).getSingleResult();
         return numBooks;
+    }
+
+    @TransactionAttribute
+    public long getNumAuthors()
+    {
+        String jpql = "select count(a) from Author a";
+        Long numAuthors = (Long) em.createQuery(jpql).getSingleResult();
+        return numAuthors;
     }
 }
