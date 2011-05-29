@@ -63,6 +63,8 @@ public class EmbeddedGlassfishContainer {
     
     private List<File> metadataFiles = new ArrayList<File>();
 
+    private File tmpBeansXml;
+
     /**
      * Default filter suppressing Glassfish and Eclipse components from the classpath when 
      * building the ad hoc WAR.
@@ -99,7 +101,18 @@ public class EmbeddedGlassfishContainer {
     private void createDefaultMetadata() {
         File webInf = new File("src/main/webapp/WEB-INF");
         metadataFiles.add(new File(webInf, "web.xml"));
-        metadataFiles.add(new File(webInf, "beans.xml"));
+        File beansXml = new File(webInf, "beans.xml");
+        if (!beansXml.exists()) {
+            beansXml = new File(System.getProperty("java.io.tmpdir"), "beans.xml");
+            try {
+                beansXml.createNewFile();
+                tmpBeansXml = beansXml;
+            }
+            catch (IOException exc) {
+                throw new RuntimeException("cannot create " + beansXml);
+            }
+        }
+        metadataFiles.add(beansXml);
     }
 
     public static synchronized EmbeddedGlassfishContainer getInstance() {
@@ -113,7 +126,8 @@ public class EmbeddedGlassfishContainer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                shutdown();
+                tmpBeansXml.delete();
+                shutdown();                
             }
         });
     }
