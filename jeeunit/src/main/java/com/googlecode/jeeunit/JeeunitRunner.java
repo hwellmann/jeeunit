@@ -27,6 +27,9 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.junit.Ignore;
 import org.junit.internal.AssumptionViolatedException;
@@ -45,15 +48,20 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
     private ContainerLauncher launcher;
     private WebResource testRunner;
+    private boolean transactionalClass;
+    private InitialContext ctx;
 
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
         System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
-        if (!isEmbedded()) {
+        if (isEmbedded()) {
+            transactionalClass = klass.getAnnotation(Transactional.class) != null;
+        }
+        else {
             launcher = ContainerLauncherLookup.getContainerLauncher();
             launcher.launch();
             URI contextRoot = launcher.autodeploy();
-            testRunner = getTestRunner(contextRoot);            
+            testRunner = getTestRunner(contextRoot);
         }
     }
 
@@ -71,7 +79,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
             try {
                 Throwable result = getRemoteTestResult(method);
                 if (result instanceof AssumptionViolatedException) {
-                    eachNotifier.addFailedAssumption((AssumptionViolatedException) result);                    
+                    eachNotifier.addFailedAssumption((AssumptionViolatedException) result);
                 }
                 else if (result != null) {
                     eachNotifier.addFailure(result);
@@ -88,17 +96,77 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
             }
         }
         else {
-            super.runChild(method, notifier);
+            boolean transactional = isTransactional(method);
+            if (transactional) {
+                runInTransaction(method, notifier);
+            }
+            else {
+                super.runChild(method, notifier);
+            }
         }
+    }
+
+    private void runInTransaction(FrameworkMethod method, RunNotifier notifier) {
+        UserTransaction tx = null;
+        EachTestNotifier eachNotifier = makeNotifier(method, notifier);
+        if (method.getAnnotation(Ignore.class) != null) {
+            eachNotifier.fireTestIgnored();
+            return;
+        }
+
+        eachNotifier.fireTestStarted();
+        try {
+            tx = (UserTransaction) ctx.lookup("java:comp/UserTransaction");
+            tx.begin();
+            methodBlock(method).evaluate();
+        }
+        catch (NamingException exc) {
+            eachNotifier.addFailure(exc);
+        }
+        catch (NotSupportedException exc) {
+            eachNotifier.addFailure(exc);
+        }
+        catch (SystemException exc) {
+            eachNotifier.addFailure(exc);
+        }
+        catch (AssumptionViolatedException e) {
+            eachNotifier.addFailedAssumption(e);
+        }
+        catch (Throwable e) {
+            eachNotifier.addFailure(e);
+        }
+        finally {
+            rollback(tx, eachNotifier);
+            eachNotifier.fireTestFinished();
+        }
+    }
+
+    private void rollback(UserTransaction tx, EachTestNotifier eachNotifier) {
+        if (tx != null) {
+            try {
+                tx.rollback();
+            }
+            catch (IllegalStateException exc) {
+                eachNotifier.addFailure(exc);
+            }
+            catch (SecurityException exc) {
+                eachNotifier.addFailure(exc);
+            }
+            catch (SystemException exc) {
+                eachNotifier.addFailure(exc);
+            }
+        }
+    }
+
+    private boolean isTransactional(FrameworkMethod method) {
+        return (method.getAnnotation(Transactional.class) != null) || transactionalClass;
     }
 
     private Throwable getRemoteTestResult(FrameworkMethod method) throws IOException,
             ClassNotFoundException {
-        InputStream is = testRunner
-            .queryParam("class", getTestClass().getName())
-            .queryParam("method", method.getName())
-            .get(InputStream.class);
-        
+        InputStream is = testRunner.queryParam("class", getTestClass().getName())
+                .queryParam("method", method.getName()).get(InputStream.class);
+
         ObjectInputStream ois = new ObjectInputStream(is);
         Object object = ois.readObject();
         if (object instanceof Throwable) {
@@ -109,12 +177,12 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         }
         throw new IllegalStateException();
     }
-    
+
     private WebResource getTestRunner(URI contextRoot) {
         URI uri = contextRoot.resolve("testrunner");
         Client client = Client.create();
         return client.resource(uri);
-        
+
     }
 
     private EachTestNotifier makeNotifier(FrameworkMethod method, RunNotifier notifier) {
@@ -143,10 +211,15 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         target.inject(test, context);
     }
 
+    /**
+     * Checks if the test is running in an embedded server. In an embedded server, a CDI 
+     * BeanManager should be available via JNDI. The method returns true iff this is the case.
+     * @return
+     */
     private boolean isEmbedded() {
         final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
         try {
-            InitialContext ctx = new InitialContext();
+            ctx = new InitialContext();
             return ctx.lookup(BEAN_MANAGER_JNDI) != null;
         }
         catch (NamingException exc) {

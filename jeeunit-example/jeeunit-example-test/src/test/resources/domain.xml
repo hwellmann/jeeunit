@@ -27,6 +27,7 @@
       <application-ref ref="__admingui" virtual-servers="__asadmin" />
       <resource-ref ref="jdbc/__TimerPool" />
       <resource-ref ref="jdbc/__default" />
+      <resource-ref ref="jdbc/jeeunit" />
     </server>
   </servers>
   <configs>

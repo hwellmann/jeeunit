@@ -3,18 +3,6 @@
     <wb-module deploy-name="jeeunit-example-test">
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-        <dependent-module archiveName="jeeunit-example-model-0.8.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jeeunit-example-model/jeeunit-example-model">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jeeunit-example-service-0.8.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jeeunit-example-service/jeeunit-example-service">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jeeunit-glassfish-0.8.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jeeunit-glassfish/jeeunit-glassfish">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jeeunit-0.8.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jeeunit/jeeunit">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="context-root" value="jeeunit-example-test"/>
         <property name="java-output-path" value="/jeeunit-example-test/target/classes"/>
     </wb-module>

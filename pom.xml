@@ -13,7 +13,7 @@
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hibernate.version>3.5.1-Final</hibernate.version>
+    <hibernate.version>3.6.0.Final</hibernate.version>
     <spring.version>3.0.5.RELEASE</spring.version>
     <logback.version>0.9.20</logback.version>
     <slf4j.version>1.5.11</slf4j.version>
@@ -68,7 +68,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.8.1</version>
+        <version>4.8.2</version>
       </dependency>
       <dependency>
         <groupId>org.glassfish.extras</groupId>
@@ -102,6 +102,12 @@
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jta_1.1_spec</artifactId>
+        <version>1.1.1</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-jpa_2.0_spec</artifactId>
         <version>1.1</version>
         <scope>provided</scope>
@@ -109,11 +115,6 @@
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-entitymanager</artifactId>
-        <version>${hibernate.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-annotations</artifactId>
         <version>${hibernate.version}</version>
       </dependency>
       <dependency>
@@ -137,9 +138,9 @@
         <version>2.2</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.weld</groupId>
+        <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se</artifactId>
-        <version>1.0.1-Final</version>
+        <version>1.1.1.Final</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>

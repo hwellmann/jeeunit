@@ -28,6 +28,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.naming.NamingException;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,6 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.googlecode.jeeunit.JeeunitRunner;
+import com.googlecode.jeeunit.Transactional;
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
 
@@ -58,6 +65,19 @@ public class AuthorTest {
         assertEquals("Buddenbrooks", book.getTitle());
     }
 
+    @Test
+    @Transactional
+    public void numAuthors() {
+        assertEquals(2, service.getNumAuthors());
+        service.createAuthor("Theodor", "Storm");
+        assertEquals(3, service.getNumAuthors());
+    }
+    
+    @Test 
+    public void numAuthorsAfterTransaction() throws NamingException, NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+        assertEquals(2, service.getNumAuthors());
+    }
+    
     /**
      * Test case for Glassfish <a
      * href="https://glassfish.dev.java.net/issues/show_bug.cgi?id=12599">bug #12599</a>.
