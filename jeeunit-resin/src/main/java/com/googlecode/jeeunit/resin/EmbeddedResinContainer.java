@@ -39,6 +39,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
@@ -182,6 +183,9 @@ public class EmbeddedResinContainer {
         }
         
         resin = new ResinEmbed();
+        HttpEmbed httpPort = new HttpEmbed(8080);
+        resin.addPort(httpPort);
+        resin.setRootDirectory("/tmp/resin");
 
         /*
          * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
@@ -226,36 +230,6 @@ public class EmbeddedResinContainer {
     }
 
 
-    /**
-     * Reads the first port number from the domain.xml configuration.
-     * @param domainConfig
-     * @return
-     */
-    private String getPortNumber(File domainConfig) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder;
-            builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(domainConfig);
-            XPathFactory xpf = XPathFactory.newInstance();
-            XPath xPath = xpf.newXPath();
-            String port = xPath.evaluate("/domain/configs/config/network-config/network-listeners/network-listener/@port", doc);
-            return port;
-        }
-        catch (ParserConfigurationException exc) {
-            throw new IllegalArgumentException(exc);
-        }
-        catch (SAXException exc) {
-            throw new IllegalArgumentException(exc);
-        }
-        catch (IOException exc) {
-            throw new IllegalArgumentException(exc);
-        }
-        catch (XPathExpressionException exc) {
-            throw new IllegalArgumentException(exc);
-        }
-    }
-
     public void shutdown() {
         resin.stop();
     }
@@ -280,7 +254,7 @@ public class EmbeddedResinContainer {
     }
     
     public URI getContextRootUri() {
-        String port = getPortNumber(configuration);
+        String port = "8080";
         try {
             return new URI(String.format("http://localhost:%s/%s/", port, getContextRoot()));
         }
