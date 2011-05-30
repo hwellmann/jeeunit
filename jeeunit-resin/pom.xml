@@ -12,6 +12,11 @@
   <name>jeeunit Resin Launcher</name>
   <dependencies>
     <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.caucho</groupId>
       <artifactId>resin</artifactId>
       <version>4.0.17</version>
@@ -38,6 +43,13 @@
         </exclusion>
 
       </exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>org.jboss.shrinkwrap</groupId>
+    	<artifactId>shrinkwrap-impl-base</artifactId>
+    	<version>1.0.0-beta-2</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
     </dependency>
   </dependencies>
   <repositories>
