@@ -197,6 +197,7 @@
     <module>jeeunit-glassfish</module>
     <module>jeeunit-concurrent</module>
     <module>jeeunit-assembly</module>
+    <module>jeeunit-resin</module>
   </modules>
 
   <repositories>
