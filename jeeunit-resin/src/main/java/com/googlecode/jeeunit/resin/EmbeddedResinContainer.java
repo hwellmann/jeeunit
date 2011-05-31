@@ -19,10 +19,12 @@ package com.googlecode.jeeunit.resin;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -38,8 +40,22 @@ import com.caucho.resin.WebAppEmbed;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
- * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Resin.
- * 
+ * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Resin. The
+ * configuration file for the deployed web app is expected in
+ * {@code src/test/resources/resin-web.xml}.
+ * <p>
+ * {@link ResinEmbed} does not let us start the server first and then deploy apps, so we actually
+ * start the container and deploy the application in {@code autodeploy()}.
+ * <p>
+ * For some reason, setting the configuration in the ResinEmbed constructor does not seem to work
+ * (or maybe something was wrong with my config files). The only way that currently works for me is
+ * embedding a resin-web.xml config file into the WAR and setting the HTTP port for the server
+ * programmatically, which is a bit awkward and does not let us define the complete configuration in
+ * a single file.
+ * <p>
+ * For overriding the default port 8080, provide a classpath resource jeeunit.properties, setting
+ * a property {@code jeeunit.resin.http.port} to the desired value.
+ *  
  * @author hwellmann
  * 
  */
@@ -58,6 +74,7 @@ public class EmbeddedResinContainer {
     private List<File> metadataFiles = new ArrayList<File>();
 
     private File tempDir;
+    private int httpPort;
 
     /**
      * Default filter suppressing Resin and Eclipse components from the classpath when building the
@@ -84,8 +101,6 @@ public class EmbeddedResinContainer {
 
     private EmbeddedResinContainer() {
         tempDir = createTempDir();
-        File domainConfig = new File("src/test/resources/resin.xml");
-        setConfiguration(domainConfig);
 
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
@@ -182,8 +197,9 @@ public class EmbeddedResinContainer {
         }
 
         resin = new ResinEmbed();
-        HttpEmbed httpPort = new HttpEmbed(8080);
-        resin.addPort(httpPort);
+        httpPort = getHttpPort();
+        HttpEmbed httpPortDef = new HttpEmbed(httpPort);
+        resin.addPort(httpPortDef);
         resin.setRootDirectory(new File(tempDir, "serverroot").getAbsolutePath());
 
         /*
@@ -193,6 +209,28 @@ public class EmbeddedResinContainer {
          */
         addShutdownHook();
 
+    }
+
+    private int getHttpPort() {
+        int httpPort = 8080;
+        Properties props = new Properties();
+        InputStream is = getClass().getResourceAsStream("/jeeunit.properties");
+        if (is != null) {
+            try {
+                props.load(is);
+                String httpPortString = props.getProperty("jeeunit.resin.http.port");
+                if (httpPortString != null) {
+                    httpPort = Integer.parseInt(httpPortString);
+                }
+            }
+            catch (IOException exc) {
+                exc.printStackTrace();
+            }
+            catch (NumberFormatException exc) {
+                // ignore
+            }
+        }
+        return httpPort;
     }
 
     private File buildWar() {
@@ -233,7 +271,7 @@ public class EmbeddedResinContainer {
     public URI autodeploy() {
         if (!isDeployed) {
             File war = buildWar();
-            WebAppEmbed webApp = new WebAppEmbed("/jeeunit",
+            WebAppEmbed webApp = new WebAppEmbed("/" + getContextRoot(),
                     new File(tempDir, "jeeunit-root").getAbsolutePath());
             webApp.setArchivePath(war.getAbsolutePath());
             resin.addWebApp(webApp);
@@ -244,9 +282,8 @@ public class EmbeddedResinContainer {
     }
 
     public URI getContextRootUri() {
-        String port = "8080";
         try {
-            return new URI(String.format("http://localhost:%s/%s/", port, getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);
