@@ -12,6 +12,7 @@
         <include>com.googlecode.jeeunit:jeeunit</include>
         <include>com.googlecode.jeeunit:jeeunit-concurrent</include>
         <include>com.googlecode.jeeunit:jeeunit-glassfish</include>
+        <include>com.googlecode.jeeunit:jeeunit-resin</include>
         <include>com.googlecode.jeeunit:jeeunit-weld-se</include>
       </includes>
     </dependencySet>

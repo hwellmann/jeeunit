@@ -17,39 +17,61 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-example-service</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.caucho</groupId>
       <artifactId>resin</artifactId>
       <version>4.0.17</version>
-      <exclusions>
-
-        <exclusion>
-          <groupId>com.caucho</groupId>
-          <artifactId>resin-hessian</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.osgi</groupId>
-          <artifactId>osgi_R4_core</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>javax.mail</groupId>
-          <artifactId>mail</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-
-      </exclusions>
     </dependency>
     <dependency>
-    	<groupId>org.jboss.shrinkwrap</groupId>
-    	<artifactId>shrinkwrap-impl-base</artifactId>
-    	<version>1.0.0-beta-2</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
+      <version>1.0.0-beta-2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+      <version>2.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <repositories>

@@ -24,20 +24,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
@@ -84,6 +75,12 @@ public class EmbeddedResinContainer {
             if (path.contains("resin-"))
                 return false;
 
+            if (path.contains("javaee-"))
+                return false;
+
+            if (path.contains("jsr250-"))
+                return false;
+
             // this is to filter all bundles deployed to the Eclipse runtime, e.g. the JUnit
             // integration
             return !path.contains("org.eclipse.osgi");            
@@ -92,7 +89,7 @@ public class EmbeddedResinContainer {
         
     private EmbeddedResinContainer() {
 
-        File domainConfig = new File("src/test/resources/domain.xml");
+        File domainConfig = new File("src/test/resources/resin.xml");
         setConfiguration(domainConfig);
         
         setApplicationName("jeeunit");
@@ -117,6 +114,7 @@ public class EmbeddedResinContainer {
             }
         }
         metadataFiles.add(beansXml);
+        metadataFiles.add(new File("src/test/resources/resin-web.xml"));
     }
 
     public static synchronized EmbeddedResinContainer getInstance() {
@@ -181,23 +179,23 @@ public class EmbeddedResinContainer {
         if (resin != null) {
             return;
         }
-        
+
+        File domainConfig = getConfiguration();
+        if (!domainConfig.exists()) {
+            throw new IllegalArgumentException(domainConfig + " not found");
+        }
         resin = new ResinEmbed();
+        //resin = new ResinEmbed(domainConfig.getAbsolutePath());
         HttpEmbed httpPort = new HttpEmbed(8080);
         resin.addPort(httpPort);
         resin.setRootDirectory("/tmp/resin");
 
         /*
          * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
-         * notified when Eclipse is finished running the test suite. The shutdown hook is just
-         * to be on the safe side.
+         * notified when Eclipse is finished running the test suite. The shutdown hook is just to be
+         * on the safe side.
          */
         addShutdownHook();
-
-//        File domainConfig = getConfiguration();
-//        if (!domainConfig.exists()) {
-//            throw new IllegalArgumentException(domainConfig + " not found");
-//        }
 
     }
 
@@ -211,11 +209,13 @@ public class EmbeddedResinContainer {
             File file = new File(pathElem);
             if (file.exists() && classpathFilter.accept(file)) {
                 if (file.isDirectory()) {
-                    war.as(ExplodedImporter.class).importDirectory(file);
+                  JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
+                  jar.as(ExplodedImporter.class).importDirectory(file);
+                  war.addAsLibrary(jar);
                 }
                 else {
                     JavaArchive jar = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
-                    war.merge(jar);
+                    war.addAsLibrary(jar);
                 }
             }
         }
@@ -224,6 +224,7 @@ public class EmbeddedResinContainer {
                 war.addAsWebInfResource(metadata);
             }
         }
+        war.setManifest(new File("src/main/resources/META-INF/MANIFEST.MF"));
         File tmpWar = new File("/tmp/jeeunit.war");
         war.as(ZipExporter.class).exportTo(tmpWar, true);
         return tmpWar;
@@ -232,13 +233,14 @@ public class EmbeddedResinContainer {
 
     public void shutdown() {
         resin.stop();
+        resin.destroy();
     }
 
     public URI autodeploy() {
         try {
             if (!isDeployed) {
                 File war = buildWar();
-                WebAppEmbed webApp = new WebAppEmbed("/jeeunit");
+                WebAppEmbed webApp = new WebAppEmbed("/jeeunit", "/tmp/jeeunit-root");
                 webApp.setArchivePath(war.getAbsolutePath());
                 resin.addWebApp(webApp);
                 resin.start();

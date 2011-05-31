@@ -126,7 +126,9 @@ public class EmbeddedGlassfishContainer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                tmpBeansXml.delete();
+                if (tmpBeansXml != null) {
+                    tmpBeansXml.delete();
+                }
                 shutdown();                
             }
         });
