@@ -23,7 +23,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
@@ -36,78 +38,70 @@ import com.caucho.resin.WebAppEmbed;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
- * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Glassfish.
+ * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Resin.
  * 
  * @author hwellmann
- *
+ * 
  */
 public class EmbeddedResinContainer {
-    
+
     private static EmbeddedResinContainer instance;
 
     private ResinEmbed resin;
     private FileFilter classpathFilter;
-    
+
     private String applicationName;
     private String contextRoot;
     private File configuration;
     private boolean isDeployed;
-    
+
     private List<File> metadataFiles = new ArrayList<File>();
 
-    private File tmpBeansXml;
+    private File tempDir;
 
     /**
-     * Default filter suppressing Glassfish and Eclipse components from the classpath when 
-     * building the ad hoc WAR.
+     * Default filter suppressing Resin and Eclipse components from the classpath when building the
+     * ad hoc WAR.
      * 
      * @author hwellmann
-     *
+     * 
      */
     private static class DefaultClasspathFilter implements FileFilter {
+
+        private static String[] excludes = { "shrinkwrap-", "resin-", "javaee-", "jsr250-",
+                "org.eclipse.osgi" };
 
         @Override
         public boolean accept(File pathname) {
             String path = pathname.getPath();
-            if (path.contains("shrinkwrap-"))
-                return false;
-
-            if (path.contains("resin-"))
-                return false;
-
-            if (path.contains("javaee-"))
-                return false;
-
-            if (path.contains("jsr250-"))
-                return false;
-
-            // this is to filter all bundles deployed to the Eclipse runtime, e.g. the JUnit
-            // integration
-            return !path.contains("org.eclipse.osgi");            
-        }        
+            for (String exclude : excludes) {
+                if (path.contains(exclude))
+                    return false;
+            }
+            return true;
+        }
     }
-        
-    private EmbeddedResinContainer() {
 
+    private EmbeddedResinContainer() {
+        tempDir = createTempDir();
         File domainConfig = new File("src/test/resources/resin.xml");
         setConfiguration(domainConfig);
-        
+
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
         setClasspathFilter(new DefaultClasspathFilter());
-        
+
         createDefaultMetadata();
     }
-    
+
     private void createDefaultMetadata() {
         File webInf = new File("src/main/webapp/WEB-INF");
         metadataFiles.add(new File(webInf, "web.xml"));
         File beansXml = new File(webInf, "beans.xml");
         if (!beansXml.exists()) {
-            beansXml = new File(System.getProperty("java.io.tmpdir"), "beans.xml");
+            beansXml = new File(tempDir, "beans.xml");
             try {
                 beansXml.createNewFile();
-                tmpBeansXml = beansXml;
             }
             catch (IOException exc) {
                 throw new RuntimeException("cannot create " + beansXml);
@@ -128,8 +122,13 @@ public class EmbeddedResinContainer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                tmpBeansXml.delete();
-                shutdown();                
+                try {
+                    FileUtils.deleteDirectory(tempDir);
+                }
+                catch (IOException exc) {
+                    // ignore
+                }
+                shutdown();
             }
         });
     }
@@ -140,6 +139,7 @@ public class EmbeddedResinContainer {
 
     /**
      * Sets the Java EE application name.
+     * 
      * @param applicationName
      */
     protected void setApplicationName(String applicationName) {
@@ -152,6 +152,7 @@ public class EmbeddedResinContainer {
 
     /**
      * Sets the context root for the deployed test application.
+     * 
      * @param contextRoot
      */
     protected void setContextRoot(String contextRoot) {
@@ -164,6 +165,7 @@ public class EmbeddedResinContainer {
 
     /**
      * Sets the configuration file for the embedded server.
+     * 
      * @param configuration
      */
     protected void setConfiguration(File configuration) {
@@ -173,22 +175,16 @@ public class EmbeddedResinContainer {
     public void setClasspathFilter(FileFilter classpathFilter) {
         this.classpathFilter = classpathFilter;
     }
-    
-    
+
     public synchronized void launch() {
         if (resin != null) {
             return;
         }
 
-        File domainConfig = getConfiguration();
-        if (!domainConfig.exists()) {
-            throw new IllegalArgumentException(domainConfig + " not found");
-        }
         resin = new ResinEmbed();
-        //resin = new ResinEmbed(domainConfig.getAbsolutePath());
         HttpEmbed httpPort = new HttpEmbed(8080);
         resin.addPort(httpPort);
-        resin.setRootDirectory("/tmp/resin");
+        resin.setRootDirectory(new File(tempDir, "serverroot").getAbsolutePath());
 
         /*
          * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
@@ -199,19 +195,19 @@ public class EmbeddedResinContainer {
 
     }
 
-    private File buildWar() throws IOException {
+    private File buildWar() {
         WebArchive war = ShrinkWrap.create(WebArchive.class);
-        
-        String classpath = System.getProperty("java.class.path");       
+
+        String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
 
         for (String pathElem : pathElems) {
             File file = new File(pathElem);
             if (file.exists() && classpathFilter.accept(file)) {
                 if (file.isDirectory()) {
-                  JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
-                  jar.as(ExplodedImporter.class).importDirectory(file);
-                  war.addAsLibrary(jar);
+                    JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
+                    jar.as(ExplodedImporter.class).importDirectory(file);
+                    war.addAsLibrary(jar);
                 }
                 else {
                     JavaArchive jar = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
@@ -224,12 +220,10 @@ public class EmbeddedResinContainer {
                 war.addAsWebInfResource(metadata);
             }
         }
-        war.setManifest(new File("src/main/resources/META-INF/MANIFEST.MF"));
-        File tmpWar = new File("/tmp/jeeunit.war");
+        File tmpWar = new File(tempDir, "jeeunit.war");
         war.as(ZipExporter.class).exportTo(tmpWar, true);
         return tmpWar;
     }
-
 
     public void shutdown() {
         resin.stop();
@@ -237,24 +231,18 @@ public class EmbeddedResinContainer {
     }
 
     public URI autodeploy() {
-        try {
-            if (!isDeployed) {
-                File war = buildWar();
-                WebAppEmbed webApp = new WebAppEmbed("/jeeunit", "/tmp/jeeunit-root");
-                webApp.setArchivePath(war.getAbsolutePath());
-                resin.addWebApp(webApp);
-                resin.start();
-                isDeployed = true;
-            }
-            return getContextRootUri();
+        if (!isDeployed) {
+            File war = buildWar();
+            WebAppEmbed webApp = new WebAppEmbed("/jeeunit",
+                    new File(tempDir, "jeeunit-root").getAbsolutePath());
+            webApp.setArchivePath(war.getAbsolutePath());
+            resin.addWebApp(webApp);
+            resin.start();
+            isDeployed = true;
         }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+        return getContextRootUri();
     }
-    
+
     public URI getContextRootUri() {
         String port = "8080";
         try {
@@ -267,5 +255,12 @@ public class EmbeddedResinContainer {
 
     public void addMetadata(File file) {
         metadataFiles.add(file);
+    }
+
+    private File createTempDir() {
+        File tmpRoot = FileUtils.getTempDirectory();
+        File tmpDir = new File(tmpRoot, UUID.randomUUID().toString());
+        tmpDir.mkdir();
+        return tmpDir;
     }
 }
