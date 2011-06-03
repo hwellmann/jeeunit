@@ -3,12 +3,12 @@
   <parent>
     <artifactId>jeeunit-parent</artifactId>
     <groupId>com.googlecode.jeeunit</groupId>
-    <version>0.8.0</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-assembly</artifactId>
   <name>jeeunit Assembly</name>
-  <version>0.8.0</version>
+  <version>0.9.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
