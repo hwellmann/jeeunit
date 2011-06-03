@@ -3,12 +3,12 @@
   <parent>
     <artifactId>jeeunit-example</artifactId>
     <groupId>com.googlecode.jeeunit</groupId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.8.0</version>
   </parent>
   <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-example-test-se</artifactId>
   <name>jeeunit Example Integration Tests Java SE</name>
-  <version>0.8.0-SNAPSHOT</version>
+  <version>0.8.0</version>
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
