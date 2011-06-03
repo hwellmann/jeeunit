@@ -212,7 +212,7 @@ public class EmbeddedResinContainer {
     }
 
     private int getHttpPort() {
-        int httpPort = 8080;
+        int httpPort = 8088;
         Properties props = new Properties();
         InputStream is = getClass().getResourceAsStream("/jeeunit.properties");
         if (is != null) {
