@@ -223,6 +223,11 @@
       <name>Glassfish</name>
       <url>http://download.java.net/maven/glassfish</url>
     </repository>
+    <repository>
+      <id>caucho</id>
+      <name>Caucho Repository</name>
+      <url>http://caucho.com/m2</url>
+    </repository>
   </repositories>
 
 </project>
