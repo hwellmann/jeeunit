@@ -8,12 +8,9 @@ bin
 gfembed*
 release.properties
 pom.xml.releaseBackup
-
-
-
-
-
-
+.classpath
+.project
+.settings
 
 syntax: regexp
 ^jeeunit-example/jeeunit-example-arquillian$
