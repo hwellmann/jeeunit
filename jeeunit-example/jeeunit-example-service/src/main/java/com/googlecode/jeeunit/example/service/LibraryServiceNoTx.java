@@ -25,6 +25,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 import com.googlecode.jeeunit.example.model.Author;
@@ -44,14 +45,14 @@ import com.googlecode.jeeunit.example.model.Book;
  * 
  */
 @Stateless
-public class LibraryService implements Serializable {
+public class LibraryServiceNoTx implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
     @PersistenceContext
     private EntityManager em;
     
-    @TransactionAttribute
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void fillLibrary()
     {
         if (getNumBooks() != 0)
@@ -84,7 +85,7 @@ public class LibraryService implements Serializable {
         return books;       
     }
     
-    @TransactionAttribute
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Author createAuthor(String firstName, String lastName)
     {
         Author author = new Author();
@@ -94,7 +95,7 @@ public class LibraryService implements Serializable {
         return author;
     }
     
-    @TransactionAttribute
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Book createBook(String title, Author author)
     {
         Book book = new Book();
