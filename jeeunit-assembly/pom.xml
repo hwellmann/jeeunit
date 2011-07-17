@@ -5,10 +5,8 @@
     <groupId>com.googlecode.jeeunit</groupId>
     <version>0.9.0-SNAPSHOT</version>
   </parent>
-  <groupId>com.googlecode.jeeunit</groupId>
   <artifactId>jeeunit-assembly</artifactId>
   <name>jeeunit Assembly</name>
-  <version>0.9.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
@@ -41,7 +39,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2</version>
         <configuration>
           <finalName>jeeunit-${project.version}</finalName>
           <descriptors>
