@@ -18,16 +18,13 @@
 package com.googlecode.jeeunit.example.service;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.persistence.TypedQuery;
 
 import com.googlecode.jeeunit.example.model.Author;
-import com.googlecode.jeeunit.example.model.Book;
 
 /**
  * NOTE: By the EJB 3.1 specification, all public business methods are transactional by default,
