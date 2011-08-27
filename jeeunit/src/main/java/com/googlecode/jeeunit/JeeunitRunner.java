@@ -49,7 +49,6 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
     private ContainerLauncher launcher;
     private WebResource testRunner;
     private boolean transactionalClass;
-    private InitialContext ctx;
 
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -116,6 +115,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
         eachNotifier.fireTestStarted();
         try {
+            InitialContext ctx = new InitialContext();
             tx = (UserTransaction) ctx.lookup("java:comp/UserTransaction");
             tx.begin();
             methodBlock(method).evaluate();
@@ -217,13 +217,15 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
      * @return
      */
     private boolean isEmbedded() {
-        final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
-        try {
-            ctx = new InitialContext();
-            return ctx.lookup(BEAN_MANAGER_JNDI) != null;
-        }
-        catch (NamingException exc) {
-            return false;
-        }
+//        final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
+//        try {
+//            ctx = new InitialContext();
+//            return ctx.lookup(BEAN_MANAGER_JNDI) != null;
+//        }
+//        catch (NamingException exc) {
+//            return false;
+//        }
+        BeanManager beanManager = BeanManagerLookup.getBeanManagerFromJndi();
+        return (beanManager != null);
     }
 }
