@@ -29,9 +29,11 @@ public class ShrinkWrapTest {
 
     @Test
     public void buildWar() {
+        File exported = new File(System.getProperty("java.io.tmpdir"), "exported.war");
+        exported.delete();
         WebArchive war = ShrinkWrap.create(WebArchive.class).
             as(ExplodedImporter.class).importDirectory("target/classes").
             as(WebArchive.class);
-        war.as(ZipExporter.class).exportTo(new File("exported.war"));
+        war.as(ZipExporter.class).exportTo(exported);
     }
 }
