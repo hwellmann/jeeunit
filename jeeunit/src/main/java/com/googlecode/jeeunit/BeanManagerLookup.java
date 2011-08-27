@@ -29,7 +29,7 @@ import com.googlecode.jeeunit.spi.BeanManagerProvider;
 public class BeanManagerLookup {
 
     private static final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
-    private static BeanManager mgr;
+    private static final String BEAN_MANAGER_JNDI_FALLBACK = "java:comp/env/BeanManager";
 
     
     /**
@@ -40,9 +40,7 @@ public class BeanManagerLookup {
      * @return bean manager, or null
      */
     public static BeanManager getBeanManager() {        
-        if (mgr == null) {
-            getBeanManagerFromJndi();
-        }
+        BeanManager mgr = getBeanManagerFromJndi();
         if (mgr == null) {
             ServiceLoader<BeanManagerProvider> loader = ServiceLoader
                     .load(BeanManagerProvider.class);
@@ -57,12 +55,23 @@ public class BeanManagerLookup {
         return mgr;
     }
 
-    private static void getBeanManagerFromJndi() {
+    public static BeanManager getBeanManagerFromJndi()
+    {
+        BeanManager mgr = getBeanManagerFromJndi(BEAN_MANAGER_JNDI);
+        if (mgr == null) {
+            mgr = getBeanManagerFromJndi(BEAN_MANAGER_JNDI_FALLBACK);            
+        }
+        return mgr;
+    }
+
+    private static BeanManager getBeanManagerFromJndi(String name) {
+        BeanManager mgr; 
         try {
             InitialContext ctx = new InitialContext();
-            mgr = (BeanManager) ctx.lookup(BEAN_MANAGER_JNDI);
+            mgr = (BeanManager) ctx.lookup(name);
         } catch (NamingException e) {
             mgr = null;
         }
+        return mgr;
     }
 }

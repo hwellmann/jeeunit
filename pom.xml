@@ -239,6 +239,7 @@
     <module>jeeunit-concurrent</module>
     <module>jeeunit-assembly</module>
     <module>jeeunit-resin</module>
+    <module>jeeunit-tomcat6</module>
   </modules>
 
   <repositories>
