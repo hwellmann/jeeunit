@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,6 +66,8 @@ public class EmbeddedGlassfishContainer {
 
     private File tmpBeansXml;
 
+    private File tmpDir;
+
     /**
      * Default filter suppressing Glassfish and Eclipse components from the classpath when 
      * building the ad hoc WAR.
@@ -99,12 +102,14 @@ public class EmbeddedGlassfishContainer {
     }
     
     private void createDefaultMetadata() {
+        
         File webInf = new File("src/main/webapp/WEB-INF");
         metadataFiles.add(new File(webInf, "web.xml"));
         File beansXml = new File(webInf, "beans.xml");
         if (!beansXml.exists()) {
-            beansXml = new File(System.getProperty("java.io.tmpdir"), "beans.xml");
+            beansXml = new File(tmpDir, "beans.xml");
             try {
+                createTempDir();
                 beansXml.createNewFile();
                 tmpBeansXml = beansXml;
             }
@@ -113,6 +118,12 @@ public class EmbeddedGlassfishContainer {
             }
         }
         metadataFiles.add(beansXml);
+    }
+
+    private void createTempDir()
+    {
+        tmpDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+        tmpDir.mkdir();
     }
 
     public static synchronized EmbeddedGlassfishContainer getInstance() {
@@ -128,6 +139,7 @@ public class EmbeddedGlassfishContainer {
             public void run() {
                 if (tmpBeansXml != null) {
                     tmpBeansXml.delete();
+                    tmpDir.delete();
                 }
                 shutdown();                
             }
