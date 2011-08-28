@@ -29,7 +29,6 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.enterprise.inject.spi.BeanManager;
-import javax.sql.DataSource;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -44,7 +43,6 @@ import org.apache.catalina.startup.Embedded;
 import org.apache.commons.io.FileUtils;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
@@ -144,7 +142,6 @@ public class EmbeddedTomcat6Container {
             }
         }
         metadataFiles.add(beansXml);
-        metadataFiles.add(new File("src/test/resources/resin-web.xml"));
     }
 
     public static synchronized EmbeddedTomcat6Container getInstance() {
@@ -273,9 +270,7 @@ public class EmbeddedTomcat6Container {
             File file = new File(pathElem);
             if (file.exists() && classpathFilter.accept(file)) {
                 if (file.isDirectory()) {
-                    JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
-                    jar.as(ExplodedImporter.class).importDirectory(file);
-                    war.addAsLibrary(jar);
+                    addClassesFromDirectory(war, file);
                 }
                 else {
                     JavaArchive jar = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
@@ -297,6 +292,18 @@ public class EmbeddedTomcat6Container {
         return tmpWar;
     }
 
+    private void addClassesFromDirectory(WebArchive war, File file)
+    {
+        int prefixLength = file.getAbsolutePath().length() + 1;
+        for (File classFile : FileUtils.listFiles(file, new String[] {"class"}, true)) {
+            if (! classFile.getPath().contains("$")) {
+                String relPath = classFile.getAbsolutePath().substring(prefixLength);
+                String className = relPath.substring(0, relPath.lastIndexOf('.')).replace('/', '.');
+                war.addClass(className);
+            }
+        }
+    }
+
     public void shutdown() {
         try
         {
@@ -310,7 +317,7 @@ public class EmbeddedTomcat6Container {
 
     public URI autodeploy() {
         if (!isDeployed) {
-            File war = buildWar();
+            buildWar();
             
             
             // create webapp loader

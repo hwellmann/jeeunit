@@ -17,5 +17,6 @@
     <module>jeeunit-example-test-spring</module>
     <module>jeeunit-example-service-bmt</module>
     <module>jeeunit-example-model-bmt</module>
+    <module>jeeunit-example-test-tomcat6</module>
   </modules>
 </project>
