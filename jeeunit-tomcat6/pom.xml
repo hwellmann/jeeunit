@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit-example-service</artifactId>
+      <artifactId>jeeunit-example-service-bmt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -101,6 +101,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>dbcp</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-impl-base</artifactId>
     </dependency>
@@ -134,6 +141,17 @@
       <scope>test</scope>
     </dependency>
 
-    
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 </project>

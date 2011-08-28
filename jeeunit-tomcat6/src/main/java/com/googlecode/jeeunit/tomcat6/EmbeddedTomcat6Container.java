@@ -29,6 +29,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.enterprise.inject.spi.BeanManager;
+import javax.sql.DataSource;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -49,7 +50,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 import com.googlecode.jeeunit.TestRunnerServlet;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
-import com.sun.jersey.api.client.filter.ContainerListener;
 
 /**
  * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Resin. The
@@ -288,6 +288,10 @@ public class EmbeddedTomcat6Container {
                 war.addAsWebInfResource(metadata);
             }
         }
+        
+        war.addAsManifestResource(new File("src/test/resources/META-INF/context.xml"));
+        
+        
         File tmpWar = new File(webappsDir, "jeeunit.war");
         war.as(ZipExporter.class).exportTo(tmpWar, true);
         return tmpWar;
@@ -322,7 +326,7 @@ public class EmbeddedTomcat6Container {
             appContext.setLoader(loader);
             appContext.setReloadable(true);
             appContext.setDefaultWebXml(defaultWebXml);
-            
+            appContext.setConfigFile("src/test/resources/META-INF/context.xml");
             
             Wrapper servlet = appContext.createWrapper();
             servlet.setServletClass(TestRunnerServlet.class.getName());
@@ -349,6 +353,14 @@ public class EmbeddedTomcat6Container {
 
             appContext.addApplicationListener("org.jboss.weld.environment.servlet.Listener");
             
+            
+//            ContextResource dataSource = new ContextResource();
+//            dataSource.setAuth("Container"); 
+//            dataSource.setName("jdbc/jeeunit");
+//            dataSource.setType(DataSource.class.getName());
+//            dataSource.setProperty("url" ,"jdbc:derby:target/jeeunitDb;create=true");
+//            dataSource.setProperty("driverClassName", "org.apache.derby.jdbc.EmbeddedDriver"); 
+//            appContext.getNamingResources().addResource(dataSource);
             
             
             Host localHost = tomcat.createHost("localhost",
