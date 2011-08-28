@@ -30,6 +30,11 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-tomcat6</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit-weld-se</artifactId>
       <version>${project.version}</version>
     </dependency>
