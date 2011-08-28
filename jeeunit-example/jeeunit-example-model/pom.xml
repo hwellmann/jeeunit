@@ -11,14 +11,6 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-ejb_3.1_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-servlet_3.0_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
     </dependency>
   </dependencies>
