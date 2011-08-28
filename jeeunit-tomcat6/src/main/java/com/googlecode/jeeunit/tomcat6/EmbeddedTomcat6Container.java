@@ -76,7 +76,10 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  */
 public class EmbeddedTomcat6Container {
 
-    public static final String CONTEXT_XML = "src/test/resources/META-INF/context.xml";
+    public static final String[] CONTEXT_XML = { 
+        "src/test/resources/META-INF/context.xml", 
+        "src/main/webapp/META-INF/context.xml", 
+    };
     public static final String BEAN_MANAGER_TYPE = "javax.enterprise.inject.spi.BeanManager";
     public static final String BEAN_MANAGER_NAME = "BeanManager";
     public static final String WELD_MANAGER_FACTORY = "org.jboss.weld.resources.ManagerObjectFactory";
@@ -306,6 +309,10 @@ public class EmbeddedTomcat6Container {
                 }
             }
         }
+        
+        File webResourceDir = new File("src/main/webapp");
+        addWebResources(war, webResourceDir);
+        
         for (File metadata : metadataFiles) {
             if (metadata.exists()) {
                 war.addAsWebInfResource(metadata);
@@ -317,10 +324,19 @@ public class EmbeddedTomcat6Container {
         return tmpWar;
     }
 
-    private void addClassesFromDirectory(WebArchive war, File file)
+    private void addWebResources(WebArchive war, File dir) {
+        int prefixLength = dir.getAbsolutePath().length() + 1;
+        for (File resource : FileUtils.listFiles(dir, null, true)) {
+            String relPath = resource.getAbsolutePath().substring(prefixLength);
+            war.addAsWebResource(resource, relPath);
+        }
+        
+    }
+
+    private void addClassesFromDirectory(WebArchive war, File dir)
     {
-        int prefixLength = file.getAbsolutePath().length() + 1;
-        for (File classFile : FileUtils.listFiles(file, new String[] {"class"}, true)) {
+        int prefixLength = dir.getAbsolutePath().length() + 1;
+        for (File classFile : FileUtils.listFiles(dir, new String[] {"class"}, true)) {
             if (! classFile.getPath().contains("$")) {
                 String relPath = classFile.getAbsolutePath().substring(prefixLength);
                 String className = relPath.substring(0, relPath.lastIndexOf('.')).replace('/', '.');
@@ -353,9 +369,12 @@ public class EmbeddedTomcat6Container {
             appContext.setReloadable(true);
             appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
 
-            File contextXml = new File(CONTEXT_XML);
-            if (contextXml.exists()) {
-                appContext.setConfigFile(CONTEXT_XML);
+            for (String fileName : CONTEXT_XML) {
+                File contextXml = new File(fileName);
+                if (contextXml.exists()) {
+                    appContext.setConfigFile(fileName);
+                    break;
+                }
             }
             
             Wrapper servlet = appContext.createWrapper();
