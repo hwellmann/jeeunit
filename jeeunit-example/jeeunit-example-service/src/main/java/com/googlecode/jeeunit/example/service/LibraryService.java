@@ -64,6 +64,15 @@ public class LibraryService implements Serializable {
     }
     
     @TransactionAttribute
+    public List<Book> findBooks()
+    {
+        String jpql = "select b from Book b";
+        TypedQuery<Book> query = em.createQuery(jpql, Book.class);
+        List<Book> books = query.getResultList();
+        return books;       
+    }
+    
+    @TransactionAttribute
     public List<Book> findBooksByAuthor(String lastName)
     {
         String jpql = "select b from Book b where b.author.lastName = :lastName";
