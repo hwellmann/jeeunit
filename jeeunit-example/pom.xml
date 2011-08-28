@@ -15,5 +15,7 @@
     <module>jeeunit-example-test</module>
     <module>jeeunit-example-test-se</module>
     <module>jeeunit-example-test-spring</module>
+    <module>jeeunit-example-service-bmt</module>
+    <module>jeeunit-example-model-bmt</module>
   </modules>
 </project>
