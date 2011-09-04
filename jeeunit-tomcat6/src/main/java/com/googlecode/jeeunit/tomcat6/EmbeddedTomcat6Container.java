@@ -84,6 +84,8 @@ public class EmbeddedTomcat6Container {
     public static final String BEAN_MANAGER_NAME = "BeanManager";
     public static final String WELD_MANAGER_FACTORY = "org.jboss.weld.resources.ManagerObjectFactory";
     public static final String WELD_SERVLET_LISTENER = "org.jboss.weld.environment.servlet.Listener";
+    public static final String SPRING_SERVLET_CLASS = "com.googlecode.jeeunit.example.spring.test.TestRunnerServlet";
+    public static final String CDI_SERVLET_CLASS = "com.googlecode.jeeunit.TestRunnerServlet";
     public static final String JEEUNIT_APPLICATION_NAME = "jeeunit";
     public static final String JEEUNIT_CONTEXT_ROOT = "/" + JEEUNIT_APPLICATION_NAME;
     public static final String TESTRUNNER_NAME = "testrunner";
@@ -325,12 +327,14 @@ public class EmbeddedTomcat6Container {
     }
 
     private void addWebResources(WebArchive war, File dir) {
-        int prefixLength = dir.getAbsolutePath().length() + 1;
-        for (File resource : FileUtils.listFiles(dir, null, true)) {
-            String relPath = resource.getAbsolutePath().substring(prefixLength);
-            war.addAsWebResource(resource, relPath);
+        if (dir.exists() && dir.isDirectory()) {
+
+            int prefixLength = dir.getAbsolutePath().length() + 1;
+            for (File resource : FileUtils.listFiles(dir, null, true)) {
+                String relPath = resource.getAbsolutePath().substring(prefixLength);
+                war.addAsWebResource(resource, relPath);
+            }
         }
-        
     }
 
     private void addClassesFromDirectory(WebArchive war, File dir)
@@ -378,7 +382,8 @@ public class EmbeddedTomcat6Container {
             }
             
             Wrapper servlet = appContext.createWrapper();
-            servlet.setServletClass(TestRunnerServlet.class.getName());
+            String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+            servlet.setServletClass(servletClass);
             servlet.setName(TESTRUNNER_NAME);
             servlet.setLoadOnStartup(2);
             

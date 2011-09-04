@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.example.spring.test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,22 +30,23 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
+import com.googlecode.jeeunit.ContainerLauncherLookup;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
-public class JeeunitRunner extends BlockJUnit4ClassRunner {
+public class JeeunitSpringRunner extends BlockJUnit4ClassRunner {
 
     private ContainerLauncher launcher;
     private WebResource testRunner;
 
-    public JeeunitRunner(Class<?> klass) throws InitializationError {
+    public JeeunitSpringRunner(Class<?> klass) throws InitializationError {
         super(klass);
         System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
-            launcher = ContainerLauncherLookup.getContainerLauncher();
-            launcher.launch();
-            URI contextRoot = launcher.autodeploy();
-            testRunner = getTestRunner(contextRoot);
+        launcher = ContainerLauncherLookup.getContainerLauncher();
+        launcher.launch();
+        URI contextRoot = launcher.autodeploy();
+        testRunner = getTestRunner(contextRoot);
     }
 
     @Override
@@ -97,7 +98,6 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         URI uri = contextRoot.resolve("testrunner");
         Client client = Client.create();
         return client.resource(uri);
-
     }
 
     private EachTestNotifier makeNotifier(FrameworkMethod method, RunNotifier notifier) {

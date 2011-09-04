@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Harald Wellmann
+ * Copyright 2011 Harald Wellmann
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  *
  */
 
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.example.spring.test;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,15 +33,17 @@ import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.notification.Failure;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.googlecode.jeeunit.ContainerTestRunnerClassRequest;
 import com.googlecode.jeeunit.report.FailureCollector;
 
-@WebServlet(urlPatterns = "/testrunner")
 public class TestRunnerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String className = request.getParameter("class");
         String methodName = request.getParameter("method");
         try {
@@ -57,7 +59,11 @@ public class TestRunnerServlet extends HttpServlet {
     }
 
     protected void runSuite(OutputStream os, Class<?> clazz, String methodName) throws IOException {
-        CdiInjector injector = new CdiInjector();
+        ServletContext context = getServletContext();
+        WebApplicationContext appContext = WebApplicationContextUtils
+                .getWebApplicationContext(context);
+        SpringInjector injector = new SpringInjector(appContext.getAutowireCapableBeanFactory());
+
         Request classRequest = new ContainerTestRunnerClassRequest(clazz, injector);
         Description method = Description.createTestDescription(clazz, methodName);
         Request request = classRequest.filterWith(method);

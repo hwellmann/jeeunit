@@ -26,11 +26,10 @@ import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.googlecode.jeeunit.JeeunitRunner;
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
 
-@RunWith(JeeunitRunner.class)
+@RunWith(JeeunitSpringRunner.class)
 public class TitleTest {
     
     @Inject
@@ -39,12 +38,11 @@ public class TitleTest {
     @Test
     public void byTitle()
     {
+        service.fillLibrary();
         List<Book> books = service.findBooksByTitle("East of Eden");
         assertEquals(1, books.size());
         
         Book book = books.get(0);
         assertEquals("Steinbeck", book.getAuthor().getLastName());
     }
-
-
 }
