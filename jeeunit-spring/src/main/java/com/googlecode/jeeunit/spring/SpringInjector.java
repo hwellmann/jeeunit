@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit.example.spring.test;
+package com.googlecode.jeeunit.spring;
 
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 

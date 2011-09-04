@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit.example.spring.test;
+package com.googlecode.jeeunit.spring;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
