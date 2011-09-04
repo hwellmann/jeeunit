@@ -1,0 +1,11 @@
+<Context path="/jeeunit" reloadable="true" >
+
+  <Resource 
+    auth="Container" 
+    name="jdbc/jeeunit" 
+    type="javax.sql.DataSource" 
+    url="jdbc:derby:target/jeeunitDb;create=true" 
+    driverClassName="org.apache.derby.jdbc.EmbeddedDriver" 
+  />  
+
+</Context>
