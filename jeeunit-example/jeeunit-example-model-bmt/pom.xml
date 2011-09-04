@@ -7,7 +7,7 @@
     <relativePath>..</relativePath>
   </parent>
   <artifactId>jeeunit-example-model-bmt</artifactId>
-  <name>jeeunit Example Modle (No JTA)</name>
+  <name>jeeunit Example Model (No JTA)</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
