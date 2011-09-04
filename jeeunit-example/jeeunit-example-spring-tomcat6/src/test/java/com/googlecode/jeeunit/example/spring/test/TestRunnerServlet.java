@@ -32,12 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
+import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.googlecode.jeeunit.ContainerTestRunnerClassRequest;
-import com.googlecode.jeeunit.report.FailureCollector;
 
 public class TestRunnerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -69,10 +69,8 @@ public class TestRunnerServlet extends HttpServlet {
         Request request = classRequest.filterWith(method);
 
         JUnitCore core = new JUnitCore();
-        FailureCollector collector = new FailureCollector();
-        core.addListener(collector);
-        core.run(request);
-        List<Failure> failures = collector.getFailures();
+        Result result = core.run(request);
+        List<Failure> failures = result.getFailures();
         ObjectOutputStream oos = new ObjectOutputStream(os);
         for (Failure failure : failures) {
             oos.writeObject(failure.getException());
