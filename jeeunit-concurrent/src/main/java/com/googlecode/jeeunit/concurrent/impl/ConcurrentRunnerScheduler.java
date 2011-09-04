@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit.concurrent;
+package com.googlecode.jeeunit.concurrent.impl;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -26,6 +26,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.junit.runners.model.RunnerScheduler;
+
+import com.googlecode.jeeunit.concurrent.Concurrent;
 
 public class ConcurrentRunnerScheduler implements RunnerScheduler {
 
@@ -48,6 +50,9 @@ public class ConcurrentRunnerScheduler implements RunnerScheduler {
 
     @Override
     public void finished() {
+    }
+
+    public void suiteFinished() {
         try {
             while (!tasks.isEmpty())
                 tasks.remove(completionService.take());

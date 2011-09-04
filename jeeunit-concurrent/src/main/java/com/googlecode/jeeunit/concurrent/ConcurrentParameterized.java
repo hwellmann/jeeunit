@@ -17,7 +17,14 @@
 
 package com.googlecode.jeeunit.concurrent;
 
+import java.util.List;
+
+import org.junit.runner.Runner;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.Parameterized;
+
+import com.googlecode.jeeunit.concurrent.impl.ConcurrentRunnerScheduler;
 
 /**
  * An extension of the {@code Parameterized} JUnit Runner for running parameterized tests
@@ -31,8 +38,26 @@ import org.junit.runners.Parameterized;
  */
 public class ConcurrentParameterized extends Parameterized {
 
+    private ConcurrentRunnerScheduler scheduler;
+
     public ConcurrentParameterized(Class<?> klass) throws Throwable {
         super(klass);
-        setScheduler(new ConcurrentRunnerScheduler(klass));
+        scheduler = new ConcurrentRunnerScheduler(klass);
+        setScheduler(scheduler);
+    }
+
+    @Override
+    public void run(RunNotifier notifier) {
+        super.run(notifier);
+        scheduler.suiteFinished();
+    }
+
+    @Override
+    protected List<Runner> getChildren() {
+        for (Runner runner : super.getChildren()) {
+            BlockJUnit4ClassRunner classRunner = (BlockJUnit4ClassRunner) runner;
+            classRunner.setScheduler(scheduler);
+        }
+        return super.getChildren();
     }
 }
