@@ -20,6 +20,7 @@
     <slf4j.version>1.5.11</slf4j.version>
     <spring.version>3.0.6.RELEASE</spring.version>
     <tomcat.version>6.0.33</tomcat.version>
+    <tomcat7.version>7.0.21</tomcat7.version>
   </properties>
   <url>http://code.google.com/p/jeeunit/</url>
   <inceptionYear>2010</inceptionYear>
@@ -252,6 +253,7 @@
     <module>jeeunit-assembly</module>
     <module>jeeunit-resin</module>
     <module>jeeunit-tomcat6</module>
+    <module>jeeunit-tomcat7</module>
     <module>jeeunit-spring</module>
     <module>jeeunit-cdi</module>
   </modules>

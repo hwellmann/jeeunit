@@ -42,10 +42,10 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
         System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
-            launcher = ContainerLauncherLookup.getContainerLauncher();
-            launcher.launch();
-            URI contextRoot = launcher.autodeploy();
-            testRunner = getTestRunner(contextRoot);
+        launcher = ContainerLauncherLookup.getContainerLauncher();
+        launcher.launch();
+        URI contextRoot = launcher.autodeploy();
+        testRunner = getTestRunner(contextRoot);
     }
 
     @Override
