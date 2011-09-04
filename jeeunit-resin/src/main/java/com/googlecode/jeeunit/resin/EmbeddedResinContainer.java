@@ -18,6 +18,8 @@ package com.googlecode.jeeunit.resin;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -28,11 +30,9 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.embeddable.archive.ScatteredArchive;
+import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
@@ -233,34 +233,42 @@ public class EmbeddedResinContainer {
         return httpPort;
     }
 
-    private File buildWar() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class);
-
+    private File buildWar() throws IOException {
+        ScatteredArchive sar;        
+        File webResourceDir = new File("src/main/webapp");
+        if (webResourceDir.exists() && webResourceDir.isDirectory()) {
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
+        }
+        else {
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);            
+        }
         String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
 
         for (String pathElem : pathElems) {
             File file = new File(pathElem);
             if (file.exists() && classpathFilter.accept(file)) {
-                if (file.isDirectory()) {
-                    JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
-                    jar.as(ExplodedImporter.class).importDirectory(file);
-                    war.addAsLibrary(jar);
-                }
-                else {
-                    JavaArchive jar = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
-                    war.addAsLibrary(jar);
-                }
+                sar.addClassPath(file);
             }
         }
         for (File metadata : metadataFiles) {
             if (metadata.exists()) {
-                war.addAsWebInfResource(metadata);
+                sar.addMetadata(metadata);
             }
         }
-        File tmpWar = new File(tempDir, "jeeunit.war");
-        war.as(ZipExporter.class).exportTo(tmpWar, true);
-        return tmpWar;
+        URI warUri = sar.toURI();
+        File war = new File(warUri);
+        File warFile = new File(tempDir, "jeeunit.war");
+        copyFile(war, warFile);
+        return war;        
+    }
+    
+    private void copyFile(File source, File target) throws IOException {
+        FileInputStream is = new FileInputStream(source);
+        FileOutputStream os = new FileOutputStream(target);
+        IOUtils.copy(is, os);
+        is.close();
+        os.close();
     }
 
     public void shutdown() {
@@ -270,7 +278,13 @@ public class EmbeddedResinContainer {
 
     public URI autodeploy() {
         if (!isDeployed) {
-            File war = buildWar();
+            File war;
+            try {
+                war = buildWar();
+            }
+            catch (IOException exc) {
+                throw new RuntimeException(exc);
+            }
             WebAppEmbed webApp = new WebAppEmbed("/" + getContextRoot(),
                     new File(tempDir, "jeeunit-root").getAbsolutePath());
             webApp.setArchivePath(war.getAbsolutePath());

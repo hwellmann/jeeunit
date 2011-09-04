@@ -292,8 +292,14 @@ public class EmbeddedTomcat6Container {
     }
 
     private URI buildWar() throws IOException {
+        ScatteredArchive sar;        
         File webResourceDir = new File("src/main/webapp");
-        ScatteredArchive sar= new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);        
+        if (webResourceDir.exists() && webResourceDir.isDirectory()) {
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
+        }
+        else {
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);            
+        }
         String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
 
