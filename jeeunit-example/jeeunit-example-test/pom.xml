@@ -60,6 +60,13 @@
       <artifactId>glassfish-embedded-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- workaround for GLASSFISH-17144 -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.2.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
