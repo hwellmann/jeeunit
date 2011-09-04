@@ -26,10 +26,11 @@ import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.googlecode.jeeunit.JeeunitRunner;
 import com.googlecode.jeeunit.example.model.Book;
 import com.googlecode.jeeunit.example.service.LibraryService;
 
-@RunWith(JeeunitSpringRunner.class)
+@RunWith(JeeunitRunner.class)
 public class TitleTest {
     
     @Inject
