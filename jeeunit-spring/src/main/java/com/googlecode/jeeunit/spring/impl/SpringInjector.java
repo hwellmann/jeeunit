@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit.spring;
+package com.googlecode.jeeunit.spring.impl;
 
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
-import com.googlecode.jeeunit.Injector;
+import com.googlecode.jeeunit.spi.Injector;
 
 public class SpringInjector implements Injector {
     

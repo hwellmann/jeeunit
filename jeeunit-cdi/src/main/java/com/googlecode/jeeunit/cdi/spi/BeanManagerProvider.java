@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit.spi;
+package com.googlecode.jeeunit.cdi.spi;
 
 import javax.enterprise.inject.spi.BeanManager;
 

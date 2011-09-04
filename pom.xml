@@ -253,6 +253,7 @@
     <module>jeeunit-resin</module>
     <module>jeeunit-tomcat6</module>
     <module>jeeunit-spring</module>
+    <module>jeeunit-cdi</module>
   </modules>
 
   <repositories>

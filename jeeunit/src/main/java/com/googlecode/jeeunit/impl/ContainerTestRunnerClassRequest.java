@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.impl;
 
 import org.junit.internal.requests.ClassRequest;
 import org.junit.runner.Runner;
 import org.junit.runners.model.RunnerBuilder;
+
+import com.googlecode.jeeunit.spi.Injector;
 
 public class ContainerTestRunnerClassRequest extends ClassRequest {
 

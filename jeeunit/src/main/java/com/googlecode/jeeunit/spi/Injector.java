@@ -15,20 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.spi;
 
-import org.junit.runner.Runner;
-import org.junit.runners.model.RunnerBuilder;
 
-public class ContainerTestRunnerBuilder extends RunnerBuilder {
-    private Injector injector;
-
-    public ContainerTestRunnerBuilder(Injector injector) {
-        this.injector = injector;
-    }
-
-    @Override
-    public Runner runnerForClass(Class<?> testClass) throws Throwable {
-        return new ContainerTestRunner(testClass, injector);
-    }
+public interface Injector {
+    void injectFields(Object target);
 }

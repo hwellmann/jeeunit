@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit.spring;
+package com.googlecode.jeeunit.spring.impl;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -37,7 +37,7 @@ import org.junit.runner.notification.Failure;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.googlecode.jeeunit.ContainerTestRunnerClassRequest;
+import com.googlecode.jeeunit.impl.ContainerTestRunnerClassRequest;
 
 public class TestRunnerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

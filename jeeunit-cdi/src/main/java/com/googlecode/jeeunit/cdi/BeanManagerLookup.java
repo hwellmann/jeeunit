@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.cdi;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -24,7 +24,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import com.googlecode.jeeunit.spi.BeanManagerProvider;
+import com.googlecode.jeeunit.cdi.spi.BeanManagerProvider;
 
 public class BeanManagerLookup {
 
