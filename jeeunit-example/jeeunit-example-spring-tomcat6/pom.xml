@@ -11,6 +11,11 @@
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-spring</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit-example-service</artifactId>
       <version>${project.version}</version>
     </dependency>

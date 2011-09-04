@@ -82,7 +82,7 @@ public class EmbeddedTomcat6Container {
     public static final String BEAN_MANAGER_NAME = "BeanManager";
     public static final String WELD_MANAGER_FACTORY = "org.jboss.weld.resources.ManagerObjectFactory";
     public static final String WELD_SERVLET_LISTENER = "org.jboss.weld.environment.servlet.Listener";
-    public static final String SPRING_SERVLET_CLASS = "com.googlecode.jeeunit.example.spring.test.TestRunnerServlet";
+    public static final String SPRING_SERVLET_CLASS = "com.googlecode.jeeunit.spring.TestRunnerServlet";
     public static final String CDI_SERVLET_CLASS = "com.googlecode.jeeunit.TestRunnerServlet";
     public static final String JEEUNIT_APPLICATION_NAME = "jeeunit";
     public static final String JEEUNIT_CONTEXT_ROOT = "/" + JEEUNIT_APPLICATION_NAME;
