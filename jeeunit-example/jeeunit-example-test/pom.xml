@@ -45,7 +45,7 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit</artifactId>
+      <artifactId>jeeunit-cdi</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

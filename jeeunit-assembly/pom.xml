@@ -15,6 +15,11 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-cdi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit-concurrent</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -26,6 +31,11 @@
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit-resin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-spring</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

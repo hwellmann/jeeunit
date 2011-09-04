@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.cdi;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;

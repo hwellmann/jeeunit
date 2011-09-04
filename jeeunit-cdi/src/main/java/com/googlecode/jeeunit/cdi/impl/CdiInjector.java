@@ -15,12 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.cdi.impl;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
+
+import com.googlecode.jeeunit.cdi.BeanManagerLookup;
+import com.googlecode.jeeunit.spi.Injector;
 
 public class CdiInjector implements Injector {
 

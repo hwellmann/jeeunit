@@ -10,7 +10,7 @@
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit</artifactId>
+      <artifactId>jeeunit-cdi</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
       <scope>compile</scope>

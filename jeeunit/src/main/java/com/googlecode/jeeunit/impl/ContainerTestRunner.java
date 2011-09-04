@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.impl;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -31,6 +31,9 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+
+import com.googlecode.jeeunit.Transactional;
+import com.googlecode.jeeunit.spi.Injector;
 
 public class ContainerTestRunner extends BlockJUnit4ClassRunner {
     private Injector injector;

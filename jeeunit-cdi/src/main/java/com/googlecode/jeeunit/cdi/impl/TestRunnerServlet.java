@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit;
+package com.googlecode.jeeunit.cdi.impl;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -34,6 +34,8 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+
+import com.googlecode.jeeunit.impl.ContainerTestRunnerClassRequest;
 
 @WebServlet(urlPatterns = "/testrunner")
 public class TestRunnerServlet extends HttpServlet {

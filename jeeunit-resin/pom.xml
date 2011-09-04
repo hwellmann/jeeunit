@@ -15,6 +15,12 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
+      <artifactId>jeeunit-cdi</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.jeeunit</groupId>
       <artifactId>jeeunit-example-service</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
