@@ -14,10 +14,11 @@
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <glassfish.version>3.1.1</glassfish.version>
     <hibernate.version>3.6.7.Final</hibernate.version>
-    <spring.version>3.0.6.RELEASE</spring.version>
     <logback.version>0.9.20</logback.version>
     <slf4j.version>1.5.11</slf4j.version>
+    <spring.version>3.0.6.RELEASE</spring.version>
     <tomcat.version>6.0.33</tomcat.version>
   </properties>
   <url>http://code.google.com/p/jeeunit/</url>
@@ -99,8 +100,13 @@
       <dependency>
         <groupId>org.glassfish.extras</groupId>
         <artifactId>glassfish-embedded-all</artifactId>
-        <version>3.1.1</version>
+        <version>${glassfish.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.common</groupId>
+        <artifactId>scattered-archive-api</artifactId>
+        <version>${glassfish.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
