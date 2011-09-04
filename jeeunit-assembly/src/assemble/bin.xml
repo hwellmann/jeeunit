@@ -16,6 +16,7 @@
         <include>com.googlecode.jeeunit:jeeunit-resin</include>
         <include>com.googlecode.jeeunit:jeeunit-spring</include>
         <include>com.googlecode.jeeunit:jeeunit-tomcat6</include>
+        <include>com.googlecode.jeeunit:jeeunit-tomcat7</include>
         <include>com.googlecode.jeeunit:jeeunit-weld-se</include>
       </includes>
     </dependencySet>
