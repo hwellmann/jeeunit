@@ -24,6 +24,8 @@ import java.util.List;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 
+import com.googlecode.jeeunit.concurrent.impl.ConcurrentRunnerScheduler;
+
 /**
  * A JUnit Runner for running tests concurrently. The tests will be scheduled to an Executor with a
  * thread pool. Use the {@code @Concurrent} annotation on the class to specify the number of threads.

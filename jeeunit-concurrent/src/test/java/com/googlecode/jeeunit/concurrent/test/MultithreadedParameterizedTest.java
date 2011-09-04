@@ -29,7 +29,7 @@ import com.googlecode.jeeunit.concurrent.Concurrent;
 import com.googlecode.jeeunit.concurrent.ConcurrentParameterized;
 
 @RunWith(ConcurrentParameterized.class)
-@Concurrent(threads = 4)
+@Concurrent(threads = 8)
 public class MultithreadedParameterizedTest {
 
     private static final int MAX_LOOP = 5;
@@ -42,17 +42,25 @@ public class MultithreadedParameterizedTest {
     @Parameters
     public static Collection<Object[]> getParameters() {
         List<Object[]> parameters = new ArrayList<Object[]>(10);
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= 4; i++) {
             parameters.add(new Object[] { i });
         }
         return parameters;
     }
 
     @Test
-    public void runMethod() throws InterruptedException {
+    public void methodOne() throws InterruptedException {
         for (int i = 0; i < MAX_LOOP; i++) {
-            System.out.println(String.format("parameter=%d: %d", parameter, i));
-            Thread.sleep(500);
+            System.out.println(String.format("methodOne: parameter=%d: %d", parameter, i));
+            Thread.sleep(2000);
+        }
+    }
+
+    @Test
+    public void methodTwo() throws InterruptedException {
+        for (int i = 0; i < MAX_LOOP; i++) {
+            System.out.println(String.format("methodTwo: parameter=%d: %d", parameter, i));
+            Thread.sleep(2000);
         }
     }
 

@@ -15,7 +15,7 @@
  *
  */
 
-package com.googlecode.jeeunit.concurrent;
+package com.googlecode.jeeunit.concurrent.impl;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
