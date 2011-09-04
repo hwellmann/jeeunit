@@ -19,8 +19,9 @@
     <logback.version>0.9.20</logback.version>
     <slf4j.version>1.5.11</slf4j.version>
     <spring.version>3.0.6.RELEASE</spring.version>
-    <tomcat.version>6.0.33</tomcat.version>
+    <tomcat6.version>6.0.33</tomcat6.version>
     <tomcat7.version>7.0.21</tomcat7.version>
+    <weld.version>1.1.2.Final</weld.version>
   </properties>
   <url>http://code.google.com/p/jeeunit/</url>
   <inceptionYear>2010</inceptionYear>
@@ -189,7 +190,12 @@
       <dependency>
         <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se</artifactId>
-        <version>1.1.1.Final</version>
+        <version>${weld.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld.servlet</groupId>
+        <artifactId>weld-servlet</artifactId>
+        <version>${weld.version}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -217,6 +223,16 @@
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <version>10.8.1.2</version>
@@ -237,9 +253,14 @@
         <version>4.0.21</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.shrinkwrap</groupId>
-        <artifactId>shrinkwrap-impl-base</artifactId>
-        <version>1.0.0-beta-5</version>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>taglibs</groupId>
+        <artifactId>standard</artifactId>
+        <version>1.1.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
