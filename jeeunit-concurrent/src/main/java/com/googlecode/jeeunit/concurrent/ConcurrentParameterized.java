@@ -52,6 +52,11 @@ public class ConcurrentParameterized extends Parameterized {
         scheduler.suiteFinished();
     }
 
+    /**
+     * Adds the concurrent scheduler to the children. Each child corresponds
+     * to a parameter set. Adding the scheduler, the methods for each parameter
+     * set will also be executed concurrently.
+     */
     @Override
     protected List<Runner> getChildren() {
         for (Runner runner : super.getChildren()) {
