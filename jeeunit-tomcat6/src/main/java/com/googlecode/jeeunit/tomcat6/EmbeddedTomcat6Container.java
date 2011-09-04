@@ -18,6 +18,7 @@ package com.googlecode.jeeunit.tomcat6;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,12 +43,9 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Embedded;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.glassfish.embeddable.archive.ScatteredArchive;
+import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
-import com.googlecode.jeeunit.TestRunnerServlet;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -293,76 +291,54 @@ public class EmbeddedTomcat6Container {
         return httpPort;
     }
 
-    private File buildWar() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class);
-
+    private URI buildWar() throws IOException {
+        File webResourceDir = new File("src/main/webapp");
+        ScatteredArchive sar= new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);        
         String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
 
         for (String pathElem : pathElems) {
             File file = new File(pathElem);
             if (file.exists() && classpathFilter.accept(file)) {
-                if (file.isDirectory()) {
-                    addClassesFromDirectory(war, file);
-                }
-                else {
-                    JavaArchive jar = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
-                    war.addAsLibrary(jar);
-                }
+                sar.addClassPath(file);
             }
         }
-        
-        File webResourceDir = new File("src/main/webapp");
-        addWebResources(war, webResourceDir);
-        
         for (File metadata : metadataFiles) {
             if (metadata.exists()) {
-                war.addAsWebInfResource(metadata);
+                sar.addMetadata(metadata);
             }
         }
-        
-        File tmpWar = new File(webappsDir, "jeeunit.war");
-        war.as(ZipExporter.class).exportTo(tmpWar, true);
-        return tmpWar;
+        URI warUri = sar.toURI();
+        File war = new File(warUri);
+        copyFile(war, new File(webappsDir, "jeeunit.war"));
+        return warUri;        
     }
-
-    private void addWebResources(WebArchive war, File dir) {
-        if (dir.exists() && dir.isDirectory()) {
-
-            int prefixLength = dir.getAbsolutePath().length() + 1;
-            for (File resource : FileUtils.listFiles(dir, null, true)) {
-                String relPath = resource.getAbsolutePath().substring(prefixLength);
-                war.addAsWebResource(resource, relPath);
-            }
-        }
-    }
-
-    private void addClassesFromDirectory(WebArchive war, File dir)
-    {
-        int prefixLength = dir.getAbsolutePath().length() + 1;
-        for (File classFile : FileUtils.listFiles(dir, new String[] {"class"}, true)) {
-            if (! classFile.getPath().contains("$")) {
-                String relPath = classFile.getAbsolutePath().substring(prefixLength);
-                String className = relPath.substring(0, relPath.lastIndexOf('.')).replace('/', '.');
-                war.addClass(className);
-            }
-        }
+    
+    private void copyFile(File source, File target) throws IOException {
+        FileInputStream is = new FileInputStream(source);
+        FileOutputStream os = new FileOutputStream(target);
+        IOUtils.copy(is, os);
+        is.close();
+        os.close();
     }
 
     public void shutdown() {
-        try
-        {
+        try {
             tomcat.stop();
         }
-        catch (LifecycleException exc)
-        {
+        catch (LifecycleException exc) {
             throw new RuntimeException(exc);
         }
     }
 
     public URI autodeploy() {
         if (!isDeployed) {
-            buildWar();
+            try {
+                buildWar();
+            }
+            catch (IOException exc) {
+                throw new RuntimeException(exc);
+            }
 
             WebappLoader loader = new WebappLoader();
             createDefaultWebXml();
