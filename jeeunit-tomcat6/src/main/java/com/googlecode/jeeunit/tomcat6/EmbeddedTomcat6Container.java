@@ -46,6 +46,7 @@ import org.apache.commons.io.IOUtils;
 import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
+import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -110,6 +111,8 @@ public class EmbeddedTomcat6Container {
     private File webappDir;
 
     private File webappsDir;
+
+    private File userWar;
     
     private File tmpDefaultWebXml;
     private boolean includeWeld;
@@ -280,6 +283,11 @@ public class EmbeddedTomcat6Container {
                 
                 String weldListenerString = props.getProperty("jeeunit.tomcat6.weld.listener", "false");
                 includeWeld = Boolean.parseBoolean(weldListenerString);
+                
+                String warBase = props.getProperty("jeeunit.war.base");
+                if (warBase != null) {
+                    userWar = new File(warBase);
+                }
             }
             catch (IOException exc) {
                 throw new RuntimeException(exc);
@@ -293,7 +301,7 @@ public class EmbeddedTomcat6Container {
 
     private URI buildWar() throws IOException {
         ScatteredArchive sar;        
-        File webResourceDir = new File("src/main/webapp");
+        File webResourceDir = getWebResourceDir();
         if (webResourceDir.exists() && webResourceDir.isDirectory()) {
             sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
         }
@@ -318,6 +326,20 @@ public class EmbeddedTomcat6Container {
         File war = new File(warUri);
         copyFile(war, new File(webappsDir, "jeeunit.war"));
         return warUri;        
+    }
+
+    private File getWebResourceDir() throws IOException {
+        File webResourceDir;
+        if (userWar == null) {
+            webResourceDir = new File("src/main/webapp");
+        }
+        else {
+            ZipExploder exploder = new ZipExploder();
+            webResourceDir = new File(tempDir, "exploded");
+            webResourceDir.mkdir();
+            exploder.processFile(userWar.getAbsolutePath(), webResourceDir.getAbsolutePath());            
+        }
+        return webResourceDir;
     }
     
     private void copyFile(File source, File target) throws IOException {
