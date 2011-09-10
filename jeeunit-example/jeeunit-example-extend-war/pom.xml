@@ -204,4 +204,38 @@
     </dependency>
 
   </dependencies>
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-war</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <phase>process-test-sources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.googlecode.jeeunit</groupId>
+                  <artifactId>jeeunit-example-spring-tomcat6</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+             <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>     
+    </plugins>    
+  </build>
 </project>
