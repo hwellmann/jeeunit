@@ -128,6 +128,7 @@ public class EmbeddedTomcat6Container {
 
         private static String[] excludes = { 
             "catalina-", 
+            "annotations-api-", 
             "coyote-", 
             "ecj-", 
             "el-api-", 
@@ -369,6 +370,7 @@ public class EmbeddedTomcat6Container {
             }
 
             WebappLoader loader = new WebappLoader();
+            loader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
             createDefaultWebXml();
                         
             StandardContext appContext = (StandardContext) tomcat.createContext(
