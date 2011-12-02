@@ -16,18 +16,19 @@
  */
 package com.googlecode.jeeunit.example.spring.web;
 
-import javax.naming.NamingException;
+import javax.annotation.Resource;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.hibernate.ejb.HibernatePersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
@@ -35,7 +36,12 @@ import com.googlecode.jeeunit.example.service.LibraryService;
 import com.googlecode.jeeunit.example.spring.web.controller.LibraryController;
 
 @Configuration
+@EnableWebMvc
+@EnableTransactionManagement(proxyTargetClass = true)
 public class WebSpringConfig {
+    
+    @Resource(mappedName = "jdbc/library")
+    private DataSource dataSource;
 
     @Bean
     public LibraryController libraryController() {
@@ -53,25 +59,9 @@ public class WebSpringConfig {
     }
 
     @Bean
-    public DataSource dataSource() {
-        JndiObjectFactoryBean factoryBean = new JndiObjectFactoryBean();
-        factoryBean.setJndiName("java:comp/env/jdbc/library");
-        try {
-            factoryBean.afterPropertiesSet();
-            return (DataSource) factoryBean.getObject();
-        }
-        catch (IllegalArgumentException exc) {
-            throw new RuntimeException(exc);
-        }
-        catch (NamingException exc) {
-            throw new RuntimeException(exc);
-        }
-    }
-
-    @Bean
     public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
-        bean.setDataSource(dataSource());
+        bean.setDataSource(dataSource);
         bean.setPersistenceProvider(new HibernatePersistence());
         bean.setPersistenceXmlLocation("classpath:META-INF/spring-persistence.xml");
         bean.afterPropertiesSet();
