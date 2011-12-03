@@ -6,7 +6,7 @@
     <version>0.9.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>jeeunit-example-spring-tomcat6</artifactId>
+  <artifactId>jeeunit-example-spring-tomcat7</artifactId>
   <packaging>war</packaging>
   <dependencies>
     <dependency>
@@ -40,7 +40,6 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
@@ -56,6 +55,11 @@
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-ejb_3.1_spec</artifactId>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-servlet_3.0_spec</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -81,6 +85,11 @@
       <artifactId>spring-orm</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <scope>runtime</scope>
@@ -102,7 +111,7 @@
 
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit-tomcat6</artifactId>
+      <artifactId>jeeunit-tomcat7</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -115,15 +124,15 @@
 
     <dependency>
       <groupId>org.apache.tomcat.extras</groupId>
-      <artifactId>juli-adapters</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-extras-juli-adapters</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat.extras</groupId>
-      <artifactId>juli</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-extras-juli</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -147,50 +156,50 @@
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>catalina</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-catalina</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>      
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>coyote</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-coyote</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>jasper</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-jasper</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>jasper-el</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-jasper-el</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>el-api</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-el-api</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>jsp-api</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-jsp-api</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>dbcp</artifactId>
-      <version>${tomcat6.version}</version>
+      <artifactId>tomcat-dbcp</artifactId>
+      <version>${tomcat7.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -207,4 +216,15 @@
     </dependency>
 
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

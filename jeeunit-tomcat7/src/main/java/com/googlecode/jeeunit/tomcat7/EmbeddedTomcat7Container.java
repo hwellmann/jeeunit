@@ -22,11 +22,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -34,7 +34,10 @@ import java.util.UUID;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextResource;
@@ -66,7 +69,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  * 
  */
-public class EmbeddedTomcat7Container {
+public class EmbeddedTomcat7Container implements LifecycleListener {
 
     public static final String[] CONTEXT_XML = { 
         "src/test/resources/META-INF/context.xml", 
@@ -105,7 +108,6 @@ public class EmbeddedTomcat7Container {
 
     private File webappsDir;
     
-    private File tmpDefaultWebXml;
     private boolean includeWeld;
     private File jeeunitWar;
 
@@ -119,15 +121,10 @@ public class EmbeddedTomcat7Container {
     private static class DefaultClasspathFilter implements FileFilter {
 
         private static String[] excludes = { 
-            "catalina-", 
-            "coyote-", 
-            "ecj-", 
-            "el-api-", 
-            "jasper-", 
-            "jsp-api-", 
-            "juli-", 
+            "tomcat-", 
             ".cp", 
             "servlet-",
+            "geronimo-servlet_",
             "shrinkwrap-", 
             };
 
@@ -180,12 +177,6 @@ public class EmbeddedTomcat7Container {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                try {
-                    FileUtils.deleteDirectory(tempDir);
-                }
-                catch (IOException exc) {
-                    // ignore
-                }
                 shutdown();
             }
         });
@@ -342,29 +333,13 @@ public class EmbeddedTomcat7Container {
                 throw new RuntimeException(exc);
             }
 
-            WebappLoader loader = new WebappLoader();
-            createDefaultWebXml();
+            WebappLoader loader = new WebappLoader(getTomcatClassLoader());
                         
             StandardContext appContext = (StandardContext) tomcat.addWebapp(
                     contextRoot, webappDir.getAbsolutePath());
             appContext.setLoader(loader);
-            appContext.setReloadable(true);
-            appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
-
-            for (String fileName : CONTEXT_XML) {
-                File contextXml = new File(fileName);
-                if (contextXml.exists()) {
-                    URL contextUrl;
-                    try {
-                        contextUrl = contextXml.toURI().toURL();
-                        appContext.setConfigFile(contextUrl);
-                    }
-                    catch (MalformedURLException exc) {
-                        throw new RuntimeException(exc);
-                    }
-                    break;
-                }
-            }
+            setContextXml(appContext);
+            appContext.addLifecycleListener(this);
             
             Wrapper servlet = appContext.createWrapper();
             String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
@@ -378,42 +353,65 @@ public class EmbeddedTomcat7Container {
             if (includeWeld) {
                 addWeldBeanManager(appContext);
             }
-            
-//            Host localHost = tomcat.createHost("localhost",
-//                    webappsDir.getAbsolutePath());
-//
-//            localHost.addChild(appContext);
-//
-//            
-//            // create engine
-//            Engine engine = tomcat.createEngine();
-//            engine.setName("Catalina");
-//            engine.addChild(localHost);
-//            engine.setDefaultHost(localHost.getName());
-//            tomcat.addEngine(engine);
-//
-//            // create http connector
-//            Connector httpConnector = tomcat.createConnector((InetAddress) null,
-//                    httpPort, false);
-//            tomcat.addConnector(httpConnector);
-//
-//            tomcat.getServer().await();
-
-            // start server
-            try
-            {
-                tomcat.enableNaming();
-                tomcat.setPort(httpPort);
-                tomcat.start();
-                isDeployed = true;
-            }
-            catch (LifecycleException exc)
-            {
-                throw new RuntimeException(exc);
-            }
+            startServer();
           
         }
         return getContextRootUri();
+    }
+
+    private void startServer() {
+        try
+        {
+            tomcat.enableNaming();
+            tomcat.setPort(httpPort);
+            tomcat.start();
+            isDeployed = true;
+        }
+        catch (LifecycleException exc)
+        {
+            exc.printStackTrace();
+            throw new RuntimeException(exc);
+        }
+    }
+
+    private void setContextXml(StandardContext appContext) {
+        for (String fileName : CONTEXT_XML) {
+            File contextXml = new File(fileName);
+            if (contextXml.exists()) {
+                URL contextUrl;
+                try {
+                    contextUrl = contextXml.toURI().toURL();
+                    appContext.setConfigFile(contextUrl);
+                }
+                catch (MalformedURLException exc) {
+                    throw new RuntimeException(exc);
+                }
+                break;
+            }
+        }
+    }
+
+    private ClassLoader getTomcatClassLoader() {
+        String classpath = System.getProperty("java.class.path");
+        String[] pathElems = classpath.split(File.pathSeparator);
+        List<URL> urls = new ArrayList<URL>();
+        for (String pathElem : pathElems) {
+            File jar = new File(pathElem);
+            if (!jar.isDirectory() && jar.exists()) {
+                if (jar.getName().startsWith("tomcat-")) {
+                    try {
+                        urls.add(jar.toURI().toURL());
+                    }
+                    catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }                
+            }
+        }
+        URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls.size()]),
+                getClass().getClassLoader().getParent());
+        return loader;        
     }
 
     private void addWeldBeanManager(StandardContext appContext)
@@ -436,23 +434,6 @@ public class EmbeddedTomcat7Container {
         appContext.addApplicationListener(WELD_SERVLET_LISTENER);
     }
 
-    // Default web.xml, contains JSP servlet, mime types, welcome default etc.
-    private void createDefaultWebXml()
-    {
-        try
-        {
-            InputStream is = getClass().getResourceAsStream("/default-web.xml");
-            tmpDefaultWebXml = new File(tempDir, "default-web.xml");
-            OutputStream os = new FileOutputStream(tmpDefaultWebXml);
-            IOUtils.copy(is, os);
-            os.close();
-        }
-        catch (IOException exc)
-        {
-            throw new RuntimeException();
-        }
-    }
-
     public URI getContextRootUri() {
         try {
             return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
@@ -471,5 +452,17 @@ public class EmbeddedTomcat7Container {
         File tmpDir = new File(tmpRoot, UUID.randomUUID().toString());
         tmpDir.mkdir();
         return tmpDir;
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getType().equals(Lifecycle.AFTER_STOP_EVENT)) {
+            try {
+                FileUtils.deleteDirectory(tempDir);
+            }
+            catch (IOException exc) {
+                // ignore
+            }
+        }
     }
 }
