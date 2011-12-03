@@ -15,6 +15,7 @@ public class LibraryWebApplicationInitializer implements WebApplicationInitializ
     public void onStartup(ServletContext sc) throws ServletException {
 
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
+        rootContext.getEnvironment().addActiveProfile("web");
         rootContext.register(WebSpringConfig.class);
         sc.addListener(new ContextLoaderListener(rootContext));
         
