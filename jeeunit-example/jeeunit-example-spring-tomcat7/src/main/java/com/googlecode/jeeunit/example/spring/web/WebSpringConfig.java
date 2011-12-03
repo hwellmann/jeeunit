@@ -16,60 +16,26 @@
  */
 package com.googlecode.jeeunit.example.spring.web;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
-import org.hibernate.ejb.HibernatePersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
-import com.googlecode.jeeunit.example.service.LibraryService;
 import com.googlecode.jeeunit.example.spring.web.controller.LibraryController;
 
 @Configuration
 @EnableWebMvc
-@EnableTransactionManagement(proxyTargetClass = true)
-@Import(DataSourceSpringConfig.class)
+@Import(ServiceSpringConfig.class)
 public class WebSpringConfig {
-    
-    @Inject
-    private DataSource dataSource;
     
     @Bean
     public LibraryController libraryController() {
         return new LibraryController();
     }
 
-    @Bean
-    public LibraryService libraryService() {
-        return new LibraryService();
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager(entityManagerFactory());
-    }
-
-    @Bean
-    public EntityManagerFactory entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
-        bean.setDataSource(dataSource);
-        bean.setPersistenceProvider(new HibernatePersistence());
-        bean.setPersistenceXmlLocation("classpath:META-INF/spring-persistence.xml");
-        bean.afterPropertiesSet();
-        return bean.getObject();
-    }
-    
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver bean = new InternalResourceViewResolver();
