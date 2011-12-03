@@ -17,66 +17,24 @@
 
 package com.googlecode.jeeunit.spring.impl;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.List;
-
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.junit.runner.Description;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Request;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.googlecode.jeeunit.impl.ContainerTestRunnerClassRequest;
+import com.googlecode.jeeunit.impl.AbstractTestRunnerServlet;
+import com.googlecode.jeeunit.spi.Injector;
 
-public class TestRunnerServlet extends HttpServlet {
+public class TestRunnerServlet extends AbstractTestRunnerServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String className = request.getParameter("class");
-        String methodName = request.getParameter("method");
-        try {
-            Class<?> clazz = getClass().getClassLoader().loadClass(className);
-            response.setContentType("application/octet-stream");
-            ServletOutputStream os = response.getOutputStream();
-            runSuite(os, clazz, methodName);
-            os.flush();
-        }
-        catch (ClassNotFoundException exc) {
-            throw new ServletException("cannot load test class " + className, exc);
-        }
-    }
-
-    protected void runSuite(OutputStream os, Class<?> clazz, String methodName) throws IOException {
+    @Override
+    protected Injector createInjector() {
         ServletContext context = getServletContext();
         WebApplicationContext appContext = WebApplicationContextUtils
                 .getWebApplicationContext(context);
         SpringInjector injector = new SpringInjector(appContext.getAutowireCapableBeanFactory());
 
-        Request classRequest = new ContainerTestRunnerClassRequest(clazz, injector);
-        Description method = Description.createTestDescription(clazz, methodName);
-        Request request = classRequest.filterWith(method);
-
-        JUnitCore core = new JUnitCore();
-        Result result = core.run(request);
-        List<Failure> failures = result.getFailures();
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        for (Failure failure : failures) {
-            oos.writeObject(failure.getException());
-        }
-        if (failures.isEmpty()) {
-            oos.writeObject("ok");
-        }
+        return injector;
     }
 }

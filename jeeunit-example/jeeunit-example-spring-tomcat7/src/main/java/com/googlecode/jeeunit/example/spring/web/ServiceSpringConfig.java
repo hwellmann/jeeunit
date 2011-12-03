@@ -16,74 +16,46 @@
  */
 package com.googlecode.jeeunit.example.spring.web;
 
-import javax.naming.NamingException;
+import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.hibernate.ejb.HibernatePersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.googlecode.jeeunit.example.service.LibraryService;
-import com.googlecode.jeeunit.example.spring.web.controller.LibraryController;
 
 @Configuration
-public class WebSpringConfig {
-
-    @Bean
-    public LibraryController libraryController() {
-        return new LibraryController();
-    }
-
-    @Bean
-    public LibraryService libraryService() {
-        return new LibraryService();
-    }
-
+@EnableTransactionManagement(proxyTargetClass = true)
+@Import(DataSourceSpringConfig.class)
+public class ServiceSpringConfig {
+    
+    @Inject
+    private DataSource dataSource;
+    
     @Bean
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager(entityManagerFactory());
     }
 
     @Bean
-    public DataSource dataSource() {
-        JndiObjectFactoryBean factoryBean = new JndiObjectFactoryBean();
-        factoryBean.setJndiName("java:comp/env/jdbc/library");
-        try {
-            factoryBean.afterPropertiesSet();
-            return (DataSource) factoryBean.getObject();
-        }
-        catch (IllegalArgumentException exc) {
-            throw new RuntimeException(exc);
-        }
-        catch (NamingException exc) {
-            throw new RuntimeException(exc);
-        }
-    }
-
-    @Bean
     public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
-        bean.setDataSource(dataSource());
+        bean.setDataSource(dataSource);
         bean.setPersistenceProvider(new HibernatePersistence());
         bean.setPersistenceXmlLocation("classpath:META-INF/spring-persistence.xml");
         bean.afterPropertiesSet();
         return bean.getObject();
     }
-    
+
     @Bean
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver bean = new InternalResourceViewResolver();
-        bean.setPrefix("/jsp/");
-        bean.setSuffix(".jsp");
-        bean.setViewClass(JstlView.class);
-        return bean;
+    public LibraryService libraryService() {
+        return new LibraryService();
     }
 }
