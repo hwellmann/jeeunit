@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -35,16 +36,15 @@ import java.util.UUID;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
-import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.tomcat.util.scan.Constants;
 import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
@@ -312,28 +312,6 @@ public class EmbeddedTomcat7Container {
         return warUri;        
     }
     
-    private void buildJarsToSkip() {
-        String classpath = System.getProperty("java.class.path");
-        String[] pathElems = classpath.split(File.pathSeparator);
-        StringBuilder buffer = new StringBuilder();
-        boolean first = false;
-        
-        for (String pathElem : pathElems) {
-            File file = new File(pathElem);
-            if (file.exists() && file.isDirectory()) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    buffer.append(",");
-                    buffer.append(pathElem);
-                }
-            }
-        }
-        buffer.append(",file:/home/hwellmann/.m2/repository/org/springframework/spring-web/3.1.0.RC2/spring-web-3.1.0.RC2.jar");   
-        System.setProperty(Constants.SKIP_JARS_PROPERTY, "tomcat__-*");
-    }
-    
     private void copyFile(File source, File target) throws IOException {
         FileInputStream is = new FileInputStream(source);
         FileOutputStream os = new FileOutputStream(target);
@@ -355,15 +333,12 @@ public class EmbeddedTomcat7Container {
         if (!isDeployed) {
             try {
                 buildWar();
-                buildJarsToSkip();
             }
             catch (IOException exc) {
                 throw new RuntimeException(exc);
             }
 
-            //Thread.currentThread().setContextClassLoader(getClass().getClassLoader().getParent());
-            
-            WebappLoader loader = new WebappLoader(getClass().getClassLoader().getParent());
+            WebappLoader loader = new WebappLoader(getTomcatClassLoader());
             loader.setLoaderClass(NoCleanupWebappClassLoader.class.getName());
             createDefaultWebXml();
                         
@@ -372,6 +347,11 @@ public class EmbeddedTomcat7Container {
             appContext.setLoader(loader);
             appContext.setReloadable(true);
             appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
+
+//            LifecycleListener listener = tomcat.getDefaultWebXmlListener();
+//            appContext.addLifecycleListener(listener);
+//            appContext.setDefaultWebXml(tomcat.noDefaultWebXmlPath());
+            
 
             for (String fileName : CONTEXT_XML) {
                 File contextXml = new File(fileName);
@@ -412,11 +392,35 @@ public class EmbeddedTomcat7Container {
             }
             catch (LifecycleException exc)
             {
+                exc.printStackTrace();
                 throw new RuntimeException(exc);
             }
           
         }
         return getContextRootUri();
+    }
+
+    private ClassLoader getTomcatClassLoader() {
+        String classpath = System.getProperty("java.class.path");
+        String[] pathElems = classpath.split(File.pathSeparator);
+        List<URL> urls = new ArrayList<URL>();
+        for (String pathElem : pathElems) {
+            File jar = new File(pathElem);
+            if (!jar.isDirectory() && jar.exists()) {
+                if (jar.getName().startsWith("tomcat-")) {
+                    try {
+                        urls.add(jar.toURI().toURL());
+                    }
+                    catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }                
+            }
+        }
+        URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls.size()]),
+                getClass().getClassLoader().getParent());
+        return loader;        
     }
 
     private void addWeldBeanManager(StandardContext appContext)
