@@ -22,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,6 +34,8 @@ import java.util.UUID;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Wrapper;
@@ -68,7 +69,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  * 
  */
-public class EmbeddedTomcat7Container {
+public class EmbeddedTomcat7Container implements LifecycleListener {
 
     public static final String[] CONTEXT_XML = { 
         "src/test/resources/META-INF/context.xml", 
@@ -107,7 +108,6 @@ public class EmbeddedTomcat7Container {
 
     private File webappsDir;
     
-    private File tmpDefaultWebXml;
     private boolean includeWeld;
     private File jeeunitWar;
 
@@ -177,12 +177,6 @@ public class EmbeddedTomcat7Container {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                try {
-                    FileUtils.deleteDirectory(tempDir);
-                }
-                catch (IOException exc) {
-                    // ignore
-                }
                 shutdown();
             }
         });
@@ -340,19 +334,12 @@ public class EmbeddedTomcat7Container {
             }
 
             WebappLoader loader = new WebappLoader(getTomcatClassLoader());
-            createDefaultWebXml();
                         
             StandardContext appContext = (StandardContext) tomcat.addWebapp(
                     contextRoot, webappDir.getAbsolutePath());
             appContext.setLoader(loader);
-            appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
-
-//            LifecycleListener listener = tomcat.getDefaultWebXmlListener();
-//            appContext.addLifecycleListener(listener);
-//            appContext.setDefaultWebXml(tomcat.noDefaultWebXmlPath());
-            
-
             setContextXml(appContext);
+            appContext.addLifecycleListener(this);
             
             Wrapper servlet = appContext.createWrapper();
             String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
@@ -447,23 +434,6 @@ public class EmbeddedTomcat7Container {
         appContext.addApplicationListener(WELD_SERVLET_LISTENER);
     }
 
-    // Default web.xml, contains JSP servlet, mime types, welcome default etc.
-    private void createDefaultWebXml()
-    {
-        try
-        {
-            InputStream is = getClass().getResourceAsStream("/default-web.xml");
-            tmpDefaultWebXml = new File(tempDir, "default-web.xml");
-            OutputStream os = new FileOutputStream(tmpDefaultWebXml);
-            IOUtils.copy(is, os);
-            os.close();
-        }
-        catch (IOException exc)
-        {
-            throw new RuntimeException();
-        }
-    }
-
     public URI getContextRootUri() {
         try {
             return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
@@ -482,5 +452,17 @@ public class EmbeddedTomcat7Container {
         File tmpDir = new File(tmpRoot, UUID.randomUUID().toString());
         tmpDir.mkdir();
         return tmpDir;
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getType().equals(Lifecycle.AFTER_STOP_EVENT)) {
+            try {
+                FileUtils.deleteDirectory(tempDir);
+            }
+            catch (IOException exc) {
+                // ignore
+            }
+        }
     }
 }
