@@ -124,6 +124,7 @@ public class EmbeddedTomcat7Container {
             "tomcat-", 
             ".cp", 
             "servlet-",
+            "geronimo-servlet_",
             "shrinkwrap-", 
             };
 
@@ -339,13 +340,11 @@ public class EmbeddedTomcat7Container {
             }
 
             WebappLoader loader = new WebappLoader(getTomcatClassLoader());
-            loader.setLoaderClass(NoCleanupWebappClassLoader.class.getName());
             createDefaultWebXml();
                         
             StandardContext appContext = (StandardContext) tomcat.addWebapp(
                     contextRoot, webappDir.getAbsolutePath());
             appContext.setLoader(loader);
-            appContext.setReloadable(true);
             appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
 
 //            LifecycleListener listener = tomcat.getDefaultWebXmlListener();
@@ -353,20 +352,7 @@ public class EmbeddedTomcat7Container {
 //            appContext.setDefaultWebXml(tomcat.noDefaultWebXmlPath());
             
 
-            for (String fileName : CONTEXT_XML) {
-                File contextXml = new File(fileName);
-                if (contextXml.exists()) {
-                    URL contextUrl;
-                    try {
-                        contextUrl = contextXml.toURI().toURL();
-                        appContext.setConfigFile(contextUrl);
-                    }
-                    catch (MalformedURLException exc) {
-                        throw new RuntimeException(exc);
-                    }
-                    break;
-                }
-            }
+            setContextXml(appContext);
             
             Wrapper servlet = appContext.createWrapper();
             String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
@@ -380,24 +366,42 @@ public class EmbeddedTomcat7Container {
             if (includeWeld) {
                 addWeldBeanManager(appContext);
             }
-            
-
-            // start server
-            try
-            {
-                tomcat.enableNaming();
-                tomcat.setPort(httpPort);
-                tomcat.start();
-                isDeployed = true;
-            }
-            catch (LifecycleException exc)
-            {
-                exc.printStackTrace();
-                throw new RuntimeException(exc);
-            }
+            startServer();
           
         }
         return getContextRootUri();
+    }
+
+    private void startServer() {
+        try
+        {
+            tomcat.enableNaming();
+            tomcat.setPort(httpPort);
+            tomcat.start();
+            isDeployed = true;
+        }
+        catch (LifecycleException exc)
+        {
+            exc.printStackTrace();
+            throw new RuntimeException(exc);
+        }
+    }
+
+    private void setContextXml(StandardContext appContext) {
+        for (String fileName : CONTEXT_XML) {
+            File contextXml = new File(fileName);
+            if (contextXml.exists()) {
+                URL contextUrl;
+                try {
+                    contextUrl = contextXml.toURI().toURL();
+                    appContext.setConfigFile(contextUrl);
+                }
+                catch (MalformedURLException exc) {
+                    throw new RuntimeException(exc);
+                }
+                break;
+            }
+        }
     }
 
     private ClassLoader getTomcatClassLoader() {
