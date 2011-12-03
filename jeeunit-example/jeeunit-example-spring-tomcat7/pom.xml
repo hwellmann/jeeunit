@@ -6,7 +6,7 @@
     <version>0.9.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>jeeunit-example-spring-tomcat6</artifactId>
+  <artifactId>jeeunit-example-spring-tomcat7</artifactId>
   <packaging>war</packaging>
   <dependencies>
     <dependency>
@@ -56,6 +56,11 @@
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-ejb_3.1_spec</artifactId>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-servlet_3.0_spec</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -207,4 +212,15 @@
     </dependency>
 
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
