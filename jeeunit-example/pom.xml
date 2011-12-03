@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>jeeunit-parent</artifactId>
+    <groupId>com.googlecode.jeeunit</groupId>
+    <version>0.9.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>jeeunit-example</artifactId>
+  <packaging>pom</packaging>
+  <name>jeeunit Example</name>
+  
+  <modules>
+    <module>jeeunit-example-model</module>
+    <module>jeeunit-example-service</module>
+    <module>jeeunit-example-test</module>
+    <module>jeeunit-example-test-se</module>
+    <module>jeeunit-example-test-spring</module>
+    <module>jeeunit-example-service-bmt</module>
+    <module>jeeunit-example-model-bmt</module>
+    <module>jeeunit-example-test-tomcat6</module>
+    <module>jeeunit-example-test-tomcat7</module>
+    <module>jeeunit-example-spring-tomcat6</module>
+    <module>jeeunit-example-extend-war</module>
+  </modules>
+</project>
