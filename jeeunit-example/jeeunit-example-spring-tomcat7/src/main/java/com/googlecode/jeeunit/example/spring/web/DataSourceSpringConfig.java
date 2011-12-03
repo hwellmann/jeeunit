@@ -19,19 +19,42 @@ package com.googlecode.jeeunit.example.spring.web;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-@Configuration
-@Profile("web")
-public class DataSourceSpringConfig {
-    
-    @Resource(mappedName = "jdbc/library")
-    private DataSource dataSource;
+import com.googlecode.jeeunit.example.spring.web.DataSourceSpringConfig.EmbeddedDataSourceSpringConfig;
+import com.googlecode.jeeunit.example.spring.web.DataSourceSpringConfig.JndiDataSourceSpringConfig;
 
-    @Bean
-    public DataSource dataSource() {
-        return dataSource;
+@Configuration
+@Import({JndiDataSourceSpringConfig.class, EmbeddedDataSourceSpringConfig.class})
+public class DataSourceSpringConfig {
+
+    @Configuration
+    @Profile("web")
+    public static class JndiDataSourceSpringConfig {
+
+        @Resource(mappedName = "jdbc/library")
+        private DataSource dataSource;
+
+        @Bean
+        public DataSource dataSource() {
+            return dataSource;
+        }
+    }
+
+    @Configuration
+    @Profile("test")
+    public static class EmbeddedDataSourceSpringConfig {
+
+        @Bean
+        public DataSource dataSource() {
+            EmbeddedDataSource dataSource = new EmbeddedDataSource();
+            dataSource.setDatabaseName("memory:library");
+            dataSource.setCreateDatabase("create");
+            return dataSource;
+        }
     }
 }
