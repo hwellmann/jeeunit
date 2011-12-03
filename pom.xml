@@ -18,7 +18,7 @@
     <hibernate.version>3.6.7.Final</hibernate.version>
     <logback.version>0.9.20</logback.version>
     <slf4j.version>1.5.11</slf4j.version>
-    <spring.version>3.0.6.RELEASE</spring.version>
+    <spring.version>3.1.0.RC2</spring.version>
     <tomcat6.version>6.0.33</tomcat6.version>
     <tomcat7.version>7.0.21</tomcat7.version>
     <weld.version>1.1.2.Final</weld.version>
