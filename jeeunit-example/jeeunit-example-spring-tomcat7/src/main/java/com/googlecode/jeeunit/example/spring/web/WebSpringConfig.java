@@ -16,13 +16,14 @@
  */
 package com.googlecode.jeeunit.example.spring.web;
 
-import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.hibernate.ejb.HibernatePersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,11 +39,12 @@ import com.googlecode.jeeunit.example.spring.web.controller.LibraryController;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement(proxyTargetClass = true)
+@Import(DataSourceSpringConfig.class)
 public class WebSpringConfig {
     
-    @Resource(mappedName = "jdbc/library")
+    @Inject
     private DataSource dataSource;
-
+    
     @Bean
     public LibraryController libraryController() {
         return new LibraryController();
