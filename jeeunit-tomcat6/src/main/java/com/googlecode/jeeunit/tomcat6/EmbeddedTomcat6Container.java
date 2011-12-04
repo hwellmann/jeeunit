@@ -18,7 +18,6 @@ package com.googlecode.jeeunit.tomcat6;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +38,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
-import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Embedded;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -261,7 +259,6 @@ public class EmbeddedTomcat6Container {
          * on the safe side.
          */
         addShutdownHook();
-
     }
 
     private void prepareDirectories() {
@@ -325,7 +322,7 @@ public class EmbeddedTomcat6Container {
         }
         URI warUri = sar.toURI();
         File war = new File(warUri);
-        copyFile(war, new File(webappsDir, "jeeunit.war"));
+        FileUtils.copyFile(war, new File(webappsDir, "jeeunit.war"));
         return warUri;        
     }
 
@@ -343,14 +340,6 @@ public class EmbeddedTomcat6Container {
         return webResourceDir;
     }
     
-    private void copyFile(File source, File target) throws IOException {
-        FileInputStream is = new FileInputStream(source);
-        FileOutputStream os = new FileOutputStream(target);
-        IOUtils.copy(is, os);
-        is.close();
-        os.close();
-    }
-
     public void shutdown() {
         try {
             tomcat.stop();
@@ -369,14 +358,10 @@ public class EmbeddedTomcat6Container {
                 throw new RuntimeException(exc);
             }
 
-            WebappLoader loader = new WebappLoader();
-            loader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
             createDefaultWebXml();
                         
             StandardContext appContext = (StandardContext) tomcat.createContext(
                     contextRoot, webappDir.getAbsolutePath());
-            appContext.setLoader(loader);
-            appContext.setReloadable(true);
             appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
 
             for (String fileName : CONTEXT_XML) {
@@ -400,39 +385,43 @@ public class EmbeddedTomcat6Container {
                 addWeldBeanManager(appContext);
             }
             
-            Host localHost = tomcat.createHost("localhost",
-                    webappsDir.getAbsolutePath());
-
-            localHost.addChild(appContext);
-
-            
-            // create engine
-            Engine engine = tomcat.createEngine();
-            engine.setName("Catalina");
-            engine.addChild(localHost);
-            engine.setDefaultHost(localHost.getName());
-            tomcat.addEngine(engine);
-
-            // create http connector
-            Connector httpConnector = tomcat.createConnector((InetAddress) null,
-                    httpPort, false);
-            tomcat.addConnector(httpConnector);
-
-            tomcat.setAwait(true);
-
-            // start server
-            try
-            {
-                tomcat.start();
-                isDeployed = true;
-            }
-            catch (LifecycleException exc)
-            {
-                throw new RuntimeException(exc);
-            }
+            startServer(appContext);
           
         }
         return getContextRootUri();
+    }
+
+    private void startServer(StandardContext appContext) {
+        Host localHost = tomcat.createHost("localhost",
+                webappsDir.getAbsolutePath());
+
+        localHost.addChild(appContext);
+
+        
+        // create engine
+        Engine engine = tomcat.createEngine();
+        engine.setName("Catalina");
+        engine.addChild(localHost);
+        engine.setDefaultHost(localHost.getName());
+        tomcat.addEngine(engine);
+
+        // create http connector
+        Connector httpConnector = tomcat.createConnector((InetAddress) null,
+                httpPort, false);
+        tomcat.addConnector(httpConnector);
+
+        tomcat.setAwait(true);
+
+        // start server
+        try
+        {
+            tomcat.start();
+            isDeployed = true;
+        }
+        catch (LifecycleException exc)
+        {
+            throw new RuntimeException(exc);
+        }
     }
 
     private void addWeldBeanManager(StandardContext appContext)

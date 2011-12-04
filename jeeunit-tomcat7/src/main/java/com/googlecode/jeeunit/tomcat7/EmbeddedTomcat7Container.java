@@ -18,8 +18,6 @@ package com.googlecode.jeeunit.tomcat7;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -45,10 +43,10 @@ import org.apache.catalina.deploy.ContextResourceEnvRef;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
+import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -110,6 +108,7 @@ public class EmbeddedTomcat7Container implements LifecycleListener {
     
     private boolean includeWeld;
     private File jeeunitWar;
+    private File userWar;
 
     /**
      * Default filter suppressing Tomcat and Eclipse components from the classpath when building the
@@ -266,6 +265,11 @@ public class EmbeddedTomcat7Container implements LifecycleListener {
                 
                 String weldListenerString = props.getProperty("jeeunit.tomcat7.weld.listener", "false");
                 includeWeld = Boolean.parseBoolean(weldListenerString);
+
+                String warBase = props.getProperty("jeeunit.war.base");
+                if (warBase != null) {
+                    userWar = new File(warBase);
+                }
             }
             catch (IOException exc) {
                 throw new RuntimeException(exc);
@@ -279,7 +283,7 @@ public class EmbeddedTomcat7Container implements LifecycleListener {
 
     private URI buildWar() throws IOException {
         ScatteredArchive sar;        
-        File webResourceDir = new File("src/main/webapp");
+        File webResourceDir = getWebResourceDir();
         if (webResourceDir.exists() && webResourceDir.isDirectory()) {
             sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
         }
@@ -303,18 +307,24 @@ public class EmbeddedTomcat7Container implements LifecycleListener {
         URI warUri = sar.toURI();
         File war = new File(warUri);
         jeeunitWar = new File(webappsDir, "jeeunit.war");
-        copyFile(war, jeeunitWar);
+        FileUtils.copyFile(war, jeeunitWar);
         return warUri;        
     }
     
-    private void copyFile(File source, File target) throws IOException {
-        FileInputStream is = new FileInputStream(source);
-        FileOutputStream os = new FileOutputStream(target);
-        IOUtils.copy(is, os);
-        is.close();
-        os.close();
+    private File getWebResourceDir() throws IOException {
+        File webResourceDir;
+        if (userWar == null) {
+            webResourceDir = new File("src/main/webapp");
+        }
+        else {
+            ZipExploder exploder = new ZipExploder();
+            webResourceDir = new File(tempDir, "exploded");
+            webResourceDir.mkdir();
+            exploder.processFile(userWar.getAbsolutePath(), webResourceDir.getAbsolutePath());            
+        }
+        return webResourceDir;
     }
-
+    
     public void shutdown() {
         try {
             tomcat.stop();
