@@ -61,21 +61,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
-    
-    <dependency>
-      <groupId>com.googlecode.jeeunit</groupId>
-      <artifactId>jeeunit-cdi</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-
+        
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-ejb_3.1_spec</artifactId>

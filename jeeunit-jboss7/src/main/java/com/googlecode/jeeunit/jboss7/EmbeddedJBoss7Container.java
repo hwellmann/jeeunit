@@ -187,6 +187,9 @@ public class EmbeddedJBoss7Container implements ContainerLauncher {
     }
 
     public synchronized void launch() {
+        if (server != null) {
+            return;
+        }
 
         config = new ConfigurationLoader().load();
         prepareDirectories();
@@ -276,6 +279,7 @@ public class EmbeddedJBoss7Container implements ContainerLauncher {
                 buildWar();
                 // TODO This method is deprecated, but what's the alternative?
                 server.deploy(jeeunitWar);
+                isDeployed = true;
             }
             catch (IOException exc) {
                 throw new RuntimeException(exc);
