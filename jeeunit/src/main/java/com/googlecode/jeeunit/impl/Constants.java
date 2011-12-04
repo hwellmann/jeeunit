@@ -22,4 +22,5 @@ public class Constants {
     public static final String KEY_HTTP_PORT = "jeeunit.http.port";
     public static final String KEY_WELD_LISTENER = "jeeunit.weld.listener";
     public static final String KEY_WAR_BASE = "jeeunit.war.base";
+    public static final String KEY_SERVER_HOME = "jeeunit.server.home";
 }

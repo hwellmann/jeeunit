@@ -5,6 +5,7 @@ public class Configuration {
     private int httpPort = Integer.parseInt(Constants.HTTP_PORT_DEFAULT);
     private boolean enableWeldListener;
     private String warBase;
+    private String serverHome;
 
     public int getHttpPort() {
         return httpPort;
@@ -28,6 +29,14 @@ public class Configuration {
 
     public void setWarBase(String warBase) {
         this.warBase = warBase;
+    }
+
+    public String getServerHome() {
+        return serverHome;
+    }
+
+    public void setServerHome(String serverHome) {
+        this.serverHome = serverHome;
     }
 
 }
