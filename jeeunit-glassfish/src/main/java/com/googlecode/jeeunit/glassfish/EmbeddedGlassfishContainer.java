@@ -42,6 +42,7 @@ import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.googlecode.jeeunit.impl.ClasspathFilter;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -75,20 +76,8 @@ public class EmbeddedGlassfishContainer {
      * @author hwellmann
      *
      */
-    private static class DefaultClasspathFilter implements FileFilter {
-
-        @Override
-        public boolean accept(File pathname) {
-            String path = pathname.getPath();
-            if (path.contains("glassfish-embedded"))
-                return false;
-
-            // this is to filter all bundles deployed to the Eclipse runtime, e.g. the JUnit
-            // integration
-            return !path.contains("org.eclipse.osgi");            
-        }        
-    }
-        
+    private static String[] excludes = {"glassfish-embedded", "org.eclipse.osgi"};
+    
     private EmbeddedGlassfishContainer() {
 
         File domainConfig = new File("src/test/resources/domain.xml");
@@ -96,7 +85,7 @@ public class EmbeddedGlassfishContainer {
         
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
-        setClasspathFilter(new DefaultClasspathFilter());
+        setClasspathFilter(new ClasspathFilter(excludes));
         
         createDefaultMetadata();
     }

@@ -37,6 +37,7 @@ import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
+import com.googlecode.jeeunit.impl.ClasspathFilter;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -76,35 +77,17 @@ public class EmbeddedResinContainer {
     private File tempDir;
     private int httpPort;
 
-    /**
-     * Default filter suppressing Resin and Eclipse components from the classpath when building the
-     * ad hoc WAR.
-     * 
-     * @author hwellmann
-     * 
-     */
-    private static class DefaultClasspathFilter implements FileFilter {
+    private static String[] excludes = { "shrinkwrap-", "resin-", "javaee-", "jsr250-",
+    "org.eclipse.osgi" };
 
-        private static String[] excludes = { "shrinkwrap-", "resin-", "javaee-", "jsr250-",
-                "org.eclipse.osgi" };
-
-        @Override
-        public boolean accept(File pathname) {
-            String path = pathname.getPath();
-            for (String exclude : excludes) {
-                if (path.contains(exclude))
-                    return false;
-            }
-            return true;
-        }
-    }
-
+    
+    
     private EmbeddedResinContainer() {
         tempDir = createTempDir();
 
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
-        setClasspathFilter(new DefaultClasspathFilter());
+        setClasspathFilter(new ClasspathFilter(excludes));
 
         createDefaultMetadata();
     }
