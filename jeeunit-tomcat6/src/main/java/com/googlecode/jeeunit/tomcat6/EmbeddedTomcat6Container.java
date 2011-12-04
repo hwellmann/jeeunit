@@ -16,7 +16,18 @@
  */
 package com.googlecode.jeeunit.tomcat6;
 
-import static com.googlecode.jeeunit.impl.Constants.*;
+import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_NAME;
+import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_TYPE;
+import static com.googlecode.jeeunit.impl.Constants.CDI_SERVLET_CLASS;
+import static com.googlecode.jeeunit.impl.Constants.CONTEXT_XML;
+import static com.googlecode.jeeunit.impl.Constants.HTTP_PORT_DEFAULT;
+import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_APPLICATION_NAME;
+import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_CONTEXT_ROOT;
+import static com.googlecode.jeeunit.impl.Constants.SPRING_SERVLET_CLASS;
+import static com.googlecode.jeeunit.impl.Constants.TESTRUNNER_NAME;
+import static com.googlecode.jeeunit.impl.Constants.TESTRUNNER_URL;
+import static com.googlecode.jeeunit.impl.Constants.WELD_MANAGER_FACTORY;
+import static com.googlecode.jeeunit.impl.Constants.WELD_SERVLET_LISTENER;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -46,6 +57,7 @@ import org.apache.commons.io.IOUtils;
 import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
+import com.googlecode.jeeunit.impl.ClasspathFilter;
 import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
@@ -108,40 +120,26 @@ public class EmbeddedTomcat6Container {
      * @author hwellmann
      * 
      */
-    private static class DefaultClasspathFilter implements FileFilter {
-
-        private static String[] excludes = { 
-            "catalina-", 
-            "annotations-api-", 
-            "coyote-", 
-            "ecj-", 
-            "el-api-", 
-            "jasper-", 
-            "jsp-api-", 
-            "juli-", 
-            ".cp", 
-            "servlet-",
-            "shrinkwrap-", 
-            };
-
-        @Override
-        public boolean accept(File pathname) {
-            String path = pathname.getPath();
-            String baseName = path.substring(path.lastIndexOf('/') + 1);
-            for (String exclude : excludes) {                
-                if (baseName.startsWith(exclude))
-                    return false;
-            }
-            return true;
-        }
-    }
+    private static String[] excludes = { 
+        "catalina-", 
+        "annotations-api-", 
+        "coyote-", 
+        "ecj-", 
+        "el-api-", 
+        "jasper-", 
+        "jsp-api-", 
+        "juli-", 
+        ".cp", 
+        "servlet-",
+        "shrinkwrap-", 
+        };
 
     private EmbeddedTomcat6Container() {
         tempDir = createTempDir();
 
         setApplicationName(JEEUNIT_APPLICATION_NAME);
         setContextRoot(JEEUNIT_CONTEXT_ROOT);
-        setClasspathFilter(new DefaultClasspathFilter());
+        setClasspathFilter(new ClasspathFilter(excludes));
 
         createDefaultMetadata();
     }
