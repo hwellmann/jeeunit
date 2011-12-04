@@ -22,5 +22,6 @@
     <module>jeeunit-example-spring-tomcat6</module>
     <module>jeeunit-example-spring-tomcat7</module>
     <module>jeeunit-example-extend-war</module>
+    <module>jeeunit-example-test-jboss7</module>
   </modules>
 </project>
