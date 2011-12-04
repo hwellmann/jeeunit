@@ -17,4 +17,9 @@ public class Constants {
     public static final String TESTRUNNER_NAME = "testrunner";
     public static final String TESTRUNNER_URL = "/testrunner";
     public static final String HTTP_PORT_DEFAULT = "8080";
+
+    public static final String CONFIG_PROPERTIES = "jeeunit.properties";
+    public static final String KEY_HTTP_PORT = "jeeunit.http.port";
+    public static final String KEY_WELD_LISTENER = "jeeunit.weld.listener";
+    public static final String KEY_WAR_BASE = "jeeunit.war.base";
 }
