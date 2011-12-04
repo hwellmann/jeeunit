@@ -21,12 +21,10 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -38,6 +36,8 @@ import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
 import com.googlecode.jeeunit.impl.ClasspathFilter;
+import com.googlecode.jeeunit.impl.Configuration;
+import com.googlecode.jeeunit.impl.ConfigurationLoader;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -75,10 +75,11 @@ public class EmbeddedResinContainer implements ContainerLauncher {
     private List<File> metadataFiles = new ArrayList<File>();
 
     private File tempDir;
-    private int httpPort;
 
     private static String[] excludes = { "shrinkwrap-", "resin-", "javaee-", "jsr250-",
     "org.eclipse.osgi" };
+
+    private Configuration config;
 
     
     
@@ -180,8 +181,8 @@ public class EmbeddedResinContainer implements ContainerLauncher {
         }
 
         resin = new ResinEmbed();
-        httpPort = getHttpPort();
-        HttpEmbed httpPortDef = new HttpEmbed(httpPort);
+        config = new ConfigurationLoader().load();
+        HttpEmbed httpPortDef = new HttpEmbed(config.getHttpPort());
         resin.addPort(httpPortDef);
         resin.setRootDirectory(new File(tempDir, "serverroot").getAbsolutePath());
 
@@ -192,28 +193,6 @@ public class EmbeddedResinContainer implements ContainerLauncher {
          */
         addShutdownHook();
 
-    }
-
-    private int getHttpPort() {
-        int httpPort = 8088;
-        Properties props = new Properties();
-        InputStream is = getClass().getResourceAsStream("/jeeunit.properties");
-        if (is != null) {
-            try {
-                props.load(is);
-                String httpPortString = props.getProperty("jeeunit.resin.http.port");
-                if (httpPortString != null) {
-                    httpPort = Integer.parseInt(httpPortString);
-                }
-            }
-            catch (IOException exc) {
-                exc.printStackTrace();
-            }
-            catch (NumberFormatException exc) {
-                // ignore
-            }
-        }
-        return httpPort;
     }
 
     private File buildWar() throws IOException {
@@ -280,7 +259,7 @@ public class EmbeddedResinContainer implements ContainerLauncher {
 
     public URI getContextRootUri() {
         try {
-            return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/", config.getHttpPort(), getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);

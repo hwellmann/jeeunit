@@ -20,7 +20,6 @@ import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_NAME;
 import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_TYPE;
 import static com.googlecode.jeeunit.impl.Constants.CDI_SERVLET_CLASS;
 import static com.googlecode.jeeunit.impl.Constants.CONTEXT_XML;
-import static com.googlecode.jeeunit.impl.Constants.HTTP_PORT_DEFAULT;
 import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_APPLICATION_NAME;
 import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_CONTEXT_ROOT;
 import static com.googlecode.jeeunit.impl.Constants.SPRING_SERVLET_CLASS;
@@ -32,7 +31,6 @@ import static com.googlecode.jeeunit.impl.Constants.WELD_SERVLET_LISTENER;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,7 +38,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -60,6 +57,8 @@ import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
 import com.googlecode.jeeunit.impl.ClasspathFilter;
+import com.googlecode.jeeunit.impl.Configuration;
+import com.googlecode.jeeunit.impl.ConfigurationLoader;
 import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
@@ -97,7 +96,6 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
     private List<File> metadataFiles = new ArrayList<File>();
 
     private File tempDir;
-    private int httpPort;
 
     private File catalinaHome;
 
@@ -105,9 +103,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
 
     private File webappsDir;
     
-    private boolean includeWeld;
     private File jeeunitWar;
-    private File userWar;
 
     /**
      * Default filter suppressing Tomcat and Eclipse components from the classpath when building the
@@ -123,6 +119,8 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         "geronimo-servlet_",
         "shrinkwrap-", 
         };
+
+    private Configuration config;
 
     private EmbeddedTomcat7Container() {
         tempDir = createTempDir();
@@ -214,7 +212,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
             return;
         }
 
-        readConfiguration();
+        config = new ConfigurationLoader().load();
         prepareDirectories();
 
         tomcat = new Tomcat();
@@ -236,34 +234,6 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         webappDir = new File(webappsDir, contextRoot);
         catalinaHome = new File(tempDir, "catalina");
       
-    }
-
-    private int readConfiguration() {
-        Properties props = new Properties();
-        InputStream is = getClass().getResourceAsStream("/jeeunit.properties");
-        if (is != null) {
-            try {
-                props.load(is);
-                
-                String httpPortString = props.getProperty("jeeunit.tomcat7.http.port", HTTP_PORT_DEFAULT);
-                httpPort = Integer.parseInt(httpPortString);
-                
-                String weldListenerString = props.getProperty("jeeunit.tomcat7.weld.listener", "false");
-                includeWeld = Boolean.parseBoolean(weldListenerString);
-
-                String warBase = props.getProperty("jeeunit.war.base");
-                if (warBase != null) {
-                    userWar = new File(warBase);
-                }
-            }
-            catch (IOException exc) {
-                throw new RuntimeException(exc);
-            }
-            catch (NumberFormatException exc) {
-                // ignore
-            }
-        }
-        return httpPort;
     }
 
     private URI buildWar() throws IOException {
@@ -298,14 +268,15 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
     
     private File getWebResourceDir() throws IOException {
         File webResourceDir;
-        if (userWar == null) {
+        String warBase = config.getWarBase();
+        if (warBase == null) {
             webResourceDir = new File("src/main/webapp");
         }
         else {
             ZipExploder exploder = new ZipExploder();
             webResourceDir = new File(tempDir, "exploded");
             webResourceDir.mkdir();
-            exploder.processFile(userWar.getAbsolutePath(), webResourceDir.getAbsolutePath());            
+            exploder.processFile(new File(warBase).getAbsolutePath(), webResourceDir.getAbsolutePath());            
         }
         return webResourceDir;
     }
@@ -333,7 +304,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
                 appContext.addLifecycleListener(this);
 
                 Wrapper servlet = appContext.createWrapper();
-                String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+                String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
                 servlet.setServletClass(servletClass);
                 servlet.setName(TESTRUNNER_NAME);
                 servlet.setLoadOnStartup(2);
@@ -341,7 +312,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
                 appContext.addChild(servlet);
                 appContext.addServletMapping(TESTRUNNER_URL, TESTRUNNER_NAME);
 
-                if (includeWeld) {
+                if (config.isEnableWeldListener()) {
                     addWeldBeanManager(appContext);
                 }
                 startServer();
@@ -361,7 +332,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         try
         {
             tomcat.enableNaming();
-            tomcat.setPort(httpPort);
+            tomcat.setPort(config.getHttpPort());
             tomcat.start();
             isDeployed = true;
         }
@@ -434,7 +405,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
 
     public URI getContextRootUri() {
         try {
-            return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/", config.getHttpPort(), getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);

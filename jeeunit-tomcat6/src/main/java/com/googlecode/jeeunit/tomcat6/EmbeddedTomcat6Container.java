@@ -20,7 +20,6 @@ import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_NAME;
 import static com.googlecode.jeeunit.impl.Constants.BEAN_MANAGER_TYPE;
 import static com.googlecode.jeeunit.impl.Constants.CDI_SERVLET_CLASS;
 import static com.googlecode.jeeunit.impl.Constants.CONTEXT_XML;
-import static com.googlecode.jeeunit.impl.Constants.HTTP_PORT_DEFAULT;
 import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_APPLICATION_NAME;
 import static com.googlecode.jeeunit.impl.Constants.JEEUNIT_CONTEXT_ROOT;
 import static com.googlecode.jeeunit.impl.Constants.SPRING_SERVLET_CLASS;
@@ -40,7 +39,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.catalina.Engine;
@@ -58,6 +56,8 @@ import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 
 import com.googlecode.jeeunit.impl.ClasspathFilter;
+import com.googlecode.jeeunit.impl.Configuration;
+import com.googlecode.jeeunit.impl.ConfigurationLoader;
 import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
@@ -100,7 +100,6 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
     private List<File> metadataFiles = new ArrayList<File>();
 
     private File tempDir;
-    private int httpPort;
 
     private File catalinaHome;
 
@@ -108,10 +107,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
     private File webappsDir;
 
-    private File userWar;
-    
     private File tmpDefaultWebXml;
-    private boolean includeWeld;
 
     /**
      * Default filter suppressing Tomcat and Eclipse components from the classpath when building the
@@ -133,6 +129,8 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         "servlet-",
         "shrinkwrap-", 
         };
+
+    private Configuration config;
 
     private EmbeddedTomcat6Container() {
         tempDir = createTempDir();
@@ -230,7 +228,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
             return;
         }
 
-        readConfiguration();
+        config = new ConfigurationLoader().load();
         prepareDirectories();
 
         tomcat = new Embedded();
@@ -251,34 +249,6 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         webappDir = new File(webappsDir, contextRoot);
         catalinaHome = new File(tempDir, "catalina");
       
-    }
-
-    private int readConfiguration() {
-        Properties props = new Properties();
-        InputStream is = getClass().getResourceAsStream("/jeeunit.properties");
-        if (is != null) {
-            try {
-                props.load(is);
-                
-                String httpPortString = props.getProperty("jeeunit.tomcat6.http.port", HTTP_PORT_DEFAULT);
-                httpPort = Integer.parseInt(httpPortString);
-                
-                String weldListenerString = props.getProperty("jeeunit.tomcat6.weld.listener", "false");
-                includeWeld = Boolean.parseBoolean(weldListenerString);
-                
-                String warBase = props.getProperty("jeeunit.war.base");
-                if (warBase != null) {
-                    userWar = new File(warBase);
-                }
-            }
-            catch (IOException exc) {
-                throw new RuntimeException(exc);
-            }
-            catch (NumberFormatException exc) {
-                // ignore
-            }
-        }
-        return httpPort;
     }
 
     private URI buildWar() throws IOException {
@@ -312,13 +282,14 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
     private File getWebResourceDir() throws IOException {
         File webResourceDir;
-        if (userWar == null) {
+        if (config.getWarBase() == null) {
             webResourceDir = new File("src/main/webapp");
         }
         else {
             ZipExploder exploder = new ZipExploder();
             webResourceDir = new File(tempDir, "exploded");
             webResourceDir.mkdir();
+            File userWar = new File(config.getWarBase());
             exploder.processFile(userWar.getAbsolutePath(), webResourceDir.getAbsolutePath());            
         }
         return webResourceDir;
@@ -357,7 +328,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
             }
             
             Wrapper servlet = appContext.createWrapper();
-            String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+            String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
             servlet.setServletClass(servletClass);
             servlet.setName(TESTRUNNER_NAME);
             servlet.setLoadOnStartup(2);
@@ -365,7 +336,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
             appContext.addChild(servlet);
             appContext.addServletMapping(TESTRUNNER_URL, TESTRUNNER_NAME);
             
-            if (includeWeld) {
+            if (config.isEnableWeldListener()) {
                 addWeldBeanManager(appContext);
             }
             
@@ -391,7 +362,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
         // create http connector
         Connector httpConnector = tomcat.createConnector((InetAddress) null,
-                httpPort, false);
+                config.getHttpPort(), false);
         tomcat.addConnector(httpConnector);
 
         tomcat.setAwait(true);
@@ -447,7 +418,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
     public URI getContextRootUri() {
         try {
-            return new URI(String.format("http://localhost:%d/%s/", httpPort, getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/", config.getHttpPort(), getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);
