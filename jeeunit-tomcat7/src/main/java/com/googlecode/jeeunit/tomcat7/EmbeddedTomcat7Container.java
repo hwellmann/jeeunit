@@ -81,7 +81,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  * 
  */
-public class EmbeddedTomcat7Container implements LifecycleListener {
+public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleListener {
 
     
     private static EmbeddedTomcat7Container instance;
@@ -319,37 +319,40 @@ public class EmbeddedTomcat7Container implements LifecycleListener {
         }
     }
 
-    public URI autodeploy() throws ServletException {
+    public URI autodeploy() {
         if (!isDeployed) {
             try {
                 buildWar();
+
+                WebappLoader loader = new WebappLoader(getTomcatClassLoader());
+
+                StandardContext appContext = (StandardContext) tomcat.addWebapp(contextRoot,
+                        webappDir.getAbsolutePath());
+                appContext.setLoader(loader);
+                setContextXml(appContext);
+                appContext.addLifecycleListener(this);
+
+                Wrapper servlet = appContext.createWrapper();
+                String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+                servlet.setServletClass(servletClass);
+                servlet.setName(TESTRUNNER_NAME);
+                servlet.setLoadOnStartup(2);
+
+                appContext.addChild(servlet);
+                appContext.addServletMapping(TESTRUNNER_URL, TESTRUNNER_NAME);
+
+                if (includeWeld) {
+                    addWeldBeanManager(appContext);
+                }
+                startServer();
             }
             catch (IOException exc) {
                 throw new RuntimeException(exc);
             }
-
-            WebappLoader loader = new WebappLoader(getTomcatClassLoader());
-                        
-            StandardContext appContext = (StandardContext) tomcat.addWebapp(
-                    contextRoot, webappDir.getAbsolutePath());
-            appContext.setLoader(loader);
-            setContextXml(appContext);
-            appContext.addLifecycleListener(this);
-            
-            Wrapper servlet = appContext.createWrapper();
-            String servletClass = includeWeld ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
-            servlet.setServletClass(servletClass);
-            servlet.setName(TESTRUNNER_NAME);
-            servlet.setLoadOnStartup(2);
-            
-            appContext.addChild(servlet);
-            appContext.addServletMapping(TESTRUNNER_URL, TESTRUNNER_NAME);
-            
-            if (includeWeld) {
-                addWeldBeanManager(appContext);
+            catch (ServletException exc) {
+                throw new RuntimeException(exc);
             }
-            startServer();
-          
+
         }
         return getContextRootUri();
     }

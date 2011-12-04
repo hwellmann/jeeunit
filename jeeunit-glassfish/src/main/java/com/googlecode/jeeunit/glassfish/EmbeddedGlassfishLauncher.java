@@ -16,10 +16,7 @@
  */
 package com.googlecode.jeeunit.glassfish;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.net.URI;
-
+import com.googlecode.jeeunit.impl.DelegatingContainerLauncher;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -32,41 +29,10 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  *
  */
-public class EmbeddedGlassfishLauncher implements ContainerLauncher {
-    
-    private EmbeddedGlassfishContainer container;
-
-    public EmbeddedGlassfishLauncher() {
-        this.container = EmbeddedGlassfishContainer.getInstance();
-    }
+public class EmbeddedGlassfishLauncher extends DelegatingContainerLauncher<EmbeddedGlassfishContainer> {
     
     @Override
-    public void launch() {
-        container.launch();
-    }
-
-    @Override
-    public void shutdown() {
-        container.shutdown();
-    }
-
-    @Override
-    public URI autodeploy() {
-        return container.autodeploy();
-    }
-
-    @Override
-    public void setClasspathFilter(FileFilter filter) {
-        container.setClasspathFilter(filter);
-    }
-
-    @Override
-    public void addMetadata(File file) {
-        container.addMetadata(file);
-    }
-
-    @Override
-    public URI getContextRootUri() {
-        return container.getContextRootUri();
+    public EmbeddedGlassfishContainer getSingleton() {
+        return EmbeddedGlassfishContainer.getInstance();
     }
 }

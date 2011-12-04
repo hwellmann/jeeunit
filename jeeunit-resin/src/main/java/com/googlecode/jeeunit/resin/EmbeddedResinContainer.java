@@ -60,7 +60,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  * 
  */
-public class EmbeddedResinContainer {
+public class EmbeddedResinContainer implements ContainerLauncher {
 
     private static EmbeddedResinContainer instance;
 
