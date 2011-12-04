@@ -51,7 +51,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  *
  */
-public class EmbeddedGlassfishContainer {
+public class EmbeddedGlassfishContainer implements ContainerLauncher {
     
     private static EmbeddedGlassfishContainer instance;
 

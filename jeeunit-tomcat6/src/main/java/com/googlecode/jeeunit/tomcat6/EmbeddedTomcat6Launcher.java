@@ -16,10 +16,7 @@
  */
 package com.googlecode.jeeunit.tomcat6;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.net.URI;
-
+import com.googlecode.jeeunit.impl.DelegatingContainerLauncher;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -32,41 +29,10 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  *
  */
-public class EmbeddedTomcat6Launcher implements ContainerLauncher {
-    
-    private EmbeddedTomcat6Container container;
-
-    public EmbeddedTomcat6Launcher() {
-        this.container = EmbeddedTomcat6Container.getInstance();
-    }
+public class EmbeddedTomcat6Launcher extends DelegatingContainerLauncher<EmbeddedTomcat6Container> {
     
     @Override
-    public void launch() {
-        container.launch();
-    }
-
-    @Override
-    public void shutdown() {
-        container.shutdown();
-    }
-
-    @Override
-    public URI autodeploy() {
-        return container.autodeploy();
-    }
-
-    @Override
-    public void setClasspathFilter(FileFilter filter) {
-        container.setClasspathFilter(filter);
-    }
-
-    @Override
-    public void addMetadata(File file) {
-        container.addMetadata(file);
-    }
-
-    @Override
-    public URI getContextRootUri() {
-        return container.getContextRootUri();
+    public EmbeddedTomcat6Container getSingleton() {
+        return EmbeddedTomcat6Container.getInstance();
     }
 }

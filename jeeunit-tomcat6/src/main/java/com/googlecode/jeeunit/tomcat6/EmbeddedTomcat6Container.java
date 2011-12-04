@@ -85,7 +85,7 @@ import com.googlecode.jeeunit.spi.ContainerLauncher;
  * @author hwellmann
  * 
  */
-public class EmbeddedTomcat6Container {
+public class EmbeddedTomcat6Container implements ContainerLauncher {
 
     private static EmbeddedTomcat6Container instance;
     
