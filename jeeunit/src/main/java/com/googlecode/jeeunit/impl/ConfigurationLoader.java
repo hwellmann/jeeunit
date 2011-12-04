@@ -25,7 +25,7 @@ public class ConfigurationLoader {
             String weldListenerString = props.getProperty(KEY_WELD_LISTENER, "false");
             config.setEnableWeldListener(Boolean.parseBoolean(weldListenerString));
 
-            config.setServerHome(props.getProperty(KEY_WAR_BASE));
+            config.setWarBase(props.getProperty(KEY_WAR_BASE));
             config.setServerHome(props.getProperty(KEY_SERVER_HOME));
         }
         return config;
