@@ -76,8 +76,20 @@ public class EmbeddedGlassfishContainer implements ContainerLauncher {
      * @author hwellmann
      *
      */
-    private static String[] excludes = {"glassfish-embedded", "org.eclipse.osgi"};
-    
+    private static class DefaultClasspathFilter implements FileFilter {
+
+        @Override
+        public boolean accept(File pathname) {
+            String path = pathname.getPath();
+            if (path.contains("glassfish-embedded"))
+                return false;
+
+            // this is to filter all bundles deployed to the Eclipse runtime, e.g. the JUnit
+            // integration
+            return !path.contains("org.eclipse.osgi");            
+        }        
+    }
+        
     private EmbeddedGlassfishContainer() {
 
         File domainConfig = new File("src/test/resources/domain.xml");
@@ -85,7 +97,7 @@ public class EmbeddedGlassfishContainer implements ContainerLauncher {
         
         setApplicationName("jeeunit");
         setContextRoot("jeeunit");
-        setClasspathFilter(new ClasspathFilter(excludes));
+        setClasspathFilter(new DefaultClasspathFilter());
         
         createDefaultMetadata();
     }
