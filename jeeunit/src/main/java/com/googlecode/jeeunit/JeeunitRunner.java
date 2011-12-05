@@ -67,9 +67,11 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
             }
         }
         catch (IOException exc) {
+            exc.printStackTrace();
             eachNotifier.addFailure(exc);
         }
         catch (ClassNotFoundException exc) {
+            exc.printStackTrace();
             eachNotifier.addFailure(exc);
         }
         finally {

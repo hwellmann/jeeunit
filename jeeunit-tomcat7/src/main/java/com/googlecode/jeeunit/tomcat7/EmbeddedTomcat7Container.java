@@ -35,7 +35,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -121,8 +120,14 @@ public class EmbeddedTomcat7Container implements ContainerLauncher,
      * @author hwellmann
      * 
      */
-    private static String[] excludes = { "tomcat-", ".cp", "servlet-",
-            "geronimo-servlet_", "shrinkwrap-", };
+    private static String[] excludes = { 
+        "tomcat-", 
+        ".cp", 
+        "servlet-",
+        "geronimo-servlet_", 
+        "shrinkwrap-", 
+        "xml-apis"
+    };
 
     private Configuration config;
 
@@ -305,7 +310,7 @@ public class EmbeddedTomcat7Container implements ContainerLauncher,
             try {
                 buildWar();
 
-                WebappLoader loader = new WebappLoader(getTomcatClassLoader());
+                WebappLoader loader = new WebappLoader();
                 loader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
 
                 StandardContext appContext = (StandardContext) tomcat
@@ -368,29 +373,6 @@ public class EmbeddedTomcat7Container implements ContainerLauncher,
                 break;
             }
         }
-    }
-
-    private ClassLoader getTomcatClassLoader() {
-        String classpath = System.getProperty("java.class.path");
-        String[] pathElems = classpath.split(File.pathSeparator);
-        List<URL> urls = new ArrayList<URL>();
-        for (String pathElem : pathElems) {
-            File jar = new File(pathElem);
-            if (!jar.isDirectory() && jar.exists()) {
-                if (jar.getName().startsWith("tomcat-")) {
-                    try {
-                        urls.add(jar.toURI().toURL());
-                    }
-                    catch (MalformedURLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls
-                .size()]), getClass().getClassLoader().getParent());
-        return loader;
     }
 
     private void addWeldBeanManager(StandardContext appContext) {
