@@ -7,7 +7,7 @@
     <relativePath>..</relativePath>
   </parent>
   <artifactId>jeeunit-example-test-tomcat7</artifactId>
-  <name>jeeunit Example Test for Tomcat 6</name>
+  <name>jeeunit Example Test for Tomcat 7</name>
 
   <dependencies>
     <dependency>
