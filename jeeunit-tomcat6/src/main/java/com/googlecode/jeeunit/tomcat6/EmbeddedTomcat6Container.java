@@ -49,6 +49,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Embedded;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -62,39 +63,48 @@ import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
- * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Tomcat 6. The
- * configuration file for the deployed web app is expected in
- * {@code src/test/resources/resin-web.xml}.
+ * Singleton implementing the {@link ContainerLauncher} functionality for
+ * Embedded Tomcat 6. The configuration file for the deployed web app is
+ * expected in {@code src/test/resources/resin-web.xml}.
  * <p>
- * {@link Embedded} does not let us start the server first and then deploy apps, so we actually
- * start the container and deploy the application in {@code autodeploy()}.
+ * {@link Embedded} does not let us start the server first and then deploy apps,
+ * so we actually start the container and deploy the application in
+ * {@code autodeploy()}.
  * <p>
- * For some reason, setting the configuration in the ResinEmbed constructor does not seem to work
- * (or maybe something was wrong with my config files). The only way that currently works for me is
- * embedding a resin-web.xml config file into the WAR and setting the HTTP port for the server
- * programmatically, which is a bit awkward and does not let us define the complete configuration in
- * a single file.
+ * For some reason, setting the configuration in the ResinEmbed constructor does
+ * not seem to work (or maybe something was wrong with my config files). The
+ * only way that currently works for me is embedding a resin-web.xml config file
+ * into the WAR and setting the HTTP port for the server programmatically, which
+ * is a bit awkward and does not let us define the complete configuration in a
+ * single file.
  * <p>
- * For configuring the Tomcat 6 container provide a properties file {@code jeeunit.properties}
- * in the classpath root. You can set the following properties:
+ * For configuring the Tomcat 6 container provide a properties file
+ * {@code jeeunit.properties} in the classpath root. You can set the following
+ * properties:
  * <ul>
- * <li>{@code jeeunit.tomcat6.http.port} port for the embedded HTTP server (default: 8080)</li>
- * <li>{@code jeeunit.tomcat6.weld.listener} add Weld listener to web.xml? (default: false)</li>
+ * <li>{@code jeeunit.tomcat6.http.port} port for the embedded HTTP server
+ * (default: 8080)</li>
+ * <li>{@code jeeunit.tomcat6.weld.listener} add Weld listener to web.xml?
+ * (default: false)</li>
  * </ul>
- *  
+ * 
  * @author hwellmann
  * 
  */
 public class EmbeddedTomcat6Container implements ContainerLauncher {
 
     private static EmbeddedTomcat6Container instance;
-    
+
     private Embedded tomcat;
+
     private FileFilter classpathFilter;
 
     private String applicationName;
+
     private String contextRoot;
+
     private File configuration;
+
     private boolean isDeployed;
 
     private List<File> metadataFiles = new ArrayList<File>();
@@ -110,25 +120,15 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
     private File tmpDefaultWebXml;
 
     /**
-     * Default filter suppressing Tomcat and Eclipse components from the classpath when building the
-     * ad hoc WAR.
+     * Default filter suppressing Tomcat and Eclipse components from the
+     * classpath when building the ad hoc WAR.
      * 
      * @author hwellmann
      * 
      */
-    private static String[] excludes = { 
-        "catalina-", 
-        "annotations-api-", 
-        "coyote-", 
-        "ecj-", 
-        "el-api-", 
-        "jasper-", 
-        "jsp-api-", 
-        "juli-", 
-        ".cp", 
-        "servlet-",
-        "shrinkwrap-", 
-        };
+    private static String[] excludes = { "catalina-", "annotations-api-",
+            "coyote-", "ecj-", "el-api-", "jasper-", "jsp-api-", "juli-",
+            ".cp", "servlet-", "shrinkwrap-", "xml-api" };
 
     private Configuration config;
 
@@ -219,10 +219,12 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         this.configuration = configuration;
     }
 
+    @Override
     public void setClasspathFilter(FileFilter classpathFilter) {
         this.classpathFilter = classpathFilter;
     }
 
+    @Override
     public synchronized void launch() {
         if (tomcat != null) {
             return;
@@ -234,11 +236,11 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         tomcat = new Embedded();
         tomcat.setCatalinaHome(catalinaHome.getAbsolutePath());
 
-        
+
         /*
-         * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
-         * notified when Eclipse is finished running the test suite. The shutdown hook is just to be
-         * on the safe side.
+         * Running under "Run as JUnit test" from Eclipse in a separate process,
+         * we do not get notified when Eclipse is finished running the test
+         * suite. The shutdown hook is just to be on the safe side.
          */
         addShutdownHook();
     }
@@ -248,17 +250,18 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         webappsDir.mkdirs();
         webappDir = new File(webappsDir, contextRoot);
         catalinaHome = new File(tempDir, "catalina");
-      
+
     }
 
     private URI buildWar() throws IOException {
-        ScatteredArchive sar;        
+        ScatteredArchive sar;
         File webResourceDir = getWebResourceDir();
         if (webResourceDir.exists() && webResourceDir.isDirectory()) {
-            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR,
+                    webResourceDir);
         }
         else {
-            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);            
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);
         }
         String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
@@ -277,7 +280,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         URI warUri = sar.toURI();
         File war = new File(warUri);
         FileUtils.copyFile(war, new File(webappsDir, "jeeunit.war"));
-        return warUri;        
+        return warUri;
     }
 
     private File getWebResourceDir() throws IOException {
@@ -290,11 +293,13 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
             webResourceDir = new File(tempDir, "exploded");
             webResourceDir.mkdir();
             File userWar = new File(config.getWarBase());
-            exploder.processFile(userWar.getAbsolutePath(), webResourceDir.getAbsolutePath());            
+            exploder.processFile(userWar.getAbsolutePath(),
+                    webResourceDir.getAbsolutePath());
         }
         return webResourceDir;
     }
-    
+
+    @Override
     public void shutdown() {
         try {
             tomcat.stop();
@@ -304,6 +309,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         }
     }
 
+    @Override
     public URI autodeploy() {
         if (!isDeployed) {
             try {
@@ -314,10 +320,14 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
             }
 
             createDefaultWebXml();
-                        
-            StandardContext appContext = (StandardContext) tomcat.createContext(
-                    contextRoot, webappDir.getAbsolutePath());
+
+            StandardContext appContext = (StandardContext) tomcat
+                    .createContext(contextRoot, webappDir.getAbsolutePath());
             appContext.setDefaultWebXml(tmpDefaultWebXml.getAbsolutePath());
+            WebappLoader loader = new WebappLoader();
+            loader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
+            appContext.setLoader(loader);
+
 
             for (String fileName : CONTEXT_XML) {
                 File contextXml = new File(fileName);
@@ -326,22 +336,23 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
                     break;
                 }
             }
-            
+
             Wrapper servlet = appContext.createWrapper();
-            String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+            String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS
+                    : SPRING_SERVLET_CLASS;
             servlet.setServletClass(servletClass);
             servlet.setName(TESTRUNNER_NAME);
             servlet.setLoadOnStartup(2);
-            
+
             appContext.addChild(servlet);
             appContext.addServletMapping(TESTRUNNER_URL, TESTRUNNER_NAME);
-            
+
             if (config.isEnableWeldListener()) {
                 addWeldBeanManager(appContext);
             }
-            
+
             startServer(appContext);
-          
+
         }
         return getContextRootUri();
     }
@@ -352,7 +363,7 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
         localHost.addChild(appContext);
 
-        
+
         // create engine
         Engine engine = tomcat.createEngine();
         engine.setName("Catalina");
@@ -368,19 +379,16 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
         tomcat.setAwait(true);
 
         // start server
-        try
-        {
+        try {
             tomcat.start();
             isDeployed = true;
         }
-        catch (LifecycleException exc)
-        {
+        catch (LifecycleException exc) {
             throw new RuntimeException(exc);
         }
     }
 
-    private void addWeldBeanManager(StandardContext appContext)
-    {
+    private void addWeldBeanManager(StandardContext appContext) {
         ContextResource resource = new ContextResource();
         resource.setAuth("Container");
         resource.setName(BEAN_MANAGER_NAME);
@@ -389,42 +397,42 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
 
         appContext.getNamingResources().addResource(resource);
 
-        
+
         ContextResourceEnvRef resourceRef = new ContextResourceEnvRef();
         resourceRef.setName(BEAN_MANAGER_NAME);
         resourceRef.setType(BEAN_MANAGER_TYPE);
-        
+
         appContext.getNamingResources().addResourceEnvRef(resourceRef);
 
         appContext.addApplicationListener(WELD_SERVLET_LISTENER);
     }
 
     // Default web.xml, contains JSP servlet, mime types, welcome default etc.
-    private void createDefaultWebXml()
-    {
-        try
-        {
+    private void createDefaultWebXml() {
+        try {
             InputStream is = getClass().getResourceAsStream("/default-web.xml");
             tmpDefaultWebXml = new File(tempDir, "default-web.xml");
             OutputStream os = new FileOutputStream(tmpDefaultWebXml);
             IOUtils.copy(is, os);
             os.close();
         }
-        catch (IOException exc)
-        {
+        catch (IOException exc) {
             throw new RuntimeException();
         }
     }
 
+    @Override
     public URI getContextRootUri() {
         try {
-            return new URI(String.format("http://localhost:%d/%s/", config.getHttpPort(), getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/",
+                    config.getHttpPort(), getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);
         }
     }
 
+    @Override
     public void addMetadata(File file) {
         metadataFiles.add(file);
     }

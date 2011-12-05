@@ -63,34 +63,43 @@ import com.googlecode.jeeunit.impl.ZipExploder;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
- * Singleton implementing the {@link ContainerLauncher} functionality for Embedded Tomcat 7. The
- * configuration file for the deployed web app is expected in
- * {@code src/test/resources/META-INF/context.xml}.
+ * Singleton implementing the {@link ContainerLauncher} functionality for
+ * Embedded Tomcat 7. The configuration file for the deployed web app is
+ * expected in {@code src/test/resources/META-INF/context.xml}.
  * <p>
- * {@link Tomcat} does not let us start the server first and then deploy apps, so we actually
- * start the container and deploy the application in {@code autodeploy()}.
+ * {@link Tomcat} does not let us start the server first and then deploy apps,
+ * so we actually start the container and deploy the application in
+ * {@code autodeploy()}.
  * <p>
- * For configuring the Tomcat 7 container provide a properties file {@code jeeunit.properties}
- * in the classpath root. You can set the following properties:
+ * For configuring the Tomcat 7 container provide a properties file
+ * {@code jeeunit.properties} in the classpath root. You can set the following
+ * properties:
  * <ul>
- * <li>{@code jeeunit.tomcat7.http.port} port for the embedded HTTP server (default: 8080)</li>
- * <li>{@code jeeunit.tomcat7.weld.listener} add Weld listener to web.xml? (default: false)</li>
+ * <li>{@code jeeunit.tomcat7.http.port} port for the embedded HTTP server
+ * (default: 8080)</li>
+ * <li>{@code jeeunit.tomcat7.weld.listener} add Weld listener to web.xml?
+ * (default: false)</li>
  * </ul>
- *  
+ * 
  * @author hwellmann
  * 
  */
-public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleListener {
+public class EmbeddedTomcat7Container implements ContainerLauncher,
+        LifecycleListener {
 
-    
+
     private static EmbeddedTomcat7Container instance;
-    
+
     private Tomcat tomcat;
+
     private FileFilter classpathFilter;
 
     private String applicationName;
+
     private String contextRoot;
+
     private File configuration;
+
     private boolean isDeployed;
 
     private List<File> metadataFiles = new ArrayList<File>();
@@ -102,23 +111,18 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
     private File webappDir;
 
     private File webappsDir;
-    
+
     private File jeeunitWar;
 
     /**
-     * Default filter suppressing Tomcat and Eclipse components from the classpath when building the
-     * ad hoc WAR.
+     * Default filter suppressing Tomcat and Eclipse components from the
+     * classpath when building the ad hoc WAR.
      * 
      * @author hwellmann
      * 
      */
-    private static String[] excludes = { 
-        "tomcat-", 
-        ".cp", 
-        "servlet-",
-        "geronimo-servlet_",
-        "shrinkwrap-", 
-        };
+    private static String[] excludes = { "tomcat-", ".cp", "servlet-",
+            "geronimo-servlet_", "shrinkwrap-", };
 
     private Configuration config;
 
@@ -203,10 +207,12 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         this.configuration = configuration;
     }
 
+    @Override
     public void setClasspathFilter(FileFilter classpathFilter) {
         this.classpathFilter = classpathFilter;
     }
 
+    @Override
     public synchronized void launch() {
         if (tomcat != null) {
             return;
@@ -218,11 +224,11 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         tomcat = new Tomcat();
         tomcat.setBaseDir(catalinaHome.getAbsolutePath());
 
-        
+
         /*
-         * Running under "Run as JUnit test" from Eclipse in a separate process, we do not get
-         * notified when Eclipse is finished running the test suite. The shutdown hook is just to be
-         * on the safe side.
+         * Running under "Run as JUnit test" from Eclipse in a separate process,
+         * we do not get notified when Eclipse is finished running the test
+         * suite. The shutdown hook is just to be on the safe side.
          */
         addShutdownHook();
 
@@ -233,17 +239,18 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         webappsDir.mkdirs();
         webappDir = new File(webappsDir, contextRoot);
         catalinaHome = new File(tempDir, "catalina");
-      
+
     }
 
     private URI buildWar() throws IOException {
-        ScatteredArchive sar;        
+        ScatteredArchive sar;
         File webResourceDir = getWebResourceDir();
         if (webResourceDir.exists() && webResourceDir.isDirectory()) {
-            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR, webResourceDir);
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR,
+                    webResourceDir);
         }
         else {
-            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);            
+            sar = new ScatteredArchive("jeeunit-autodeploy", Type.WAR);
         }
         String classpath = System.getProperty("java.class.path");
         String[] pathElems = classpath.split(File.pathSeparator);
@@ -263,9 +270,9 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         File war = new File(warUri);
         jeeunitWar = new File(webappsDir, "jeeunit.war");
         FileUtils.copyFile(war, jeeunitWar);
-        return warUri;        
+        return warUri;
     }
-    
+
     private File getWebResourceDir() throws IOException {
         File webResourceDir;
         String warBase = config.getWarBase();
@@ -276,11 +283,13 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
             ZipExploder exploder = new ZipExploder();
             webResourceDir = new File(tempDir, "exploded");
             webResourceDir.mkdir();
-            exploder.processFile(new File(warBase).getAbsolutePath(), webResourceDir.getAbsolutePath());            
+            exploder.processFile(new File(warBase).getAbsolutePath(),
+                    webResourceDir.getAbsolutePath());
         }
         return webResourceDir;
     }
-    
+
+    @Override
     public void shutdown() {
         try {
             tomcat.stop();
@@ -290,21 +299,24 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
         }
     }
 
+    @Override
     public URI autodeploy() {
         if (!isDeployed) {
             try {
                 buildWar();
 
                 WebappLoader loader = new WebappLoader(getTomcatClassLoader());
+                loader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
 
-                StandardContext appContext = (StandardContext) tomcat.addWebapp(contextRoot,
-                        webappDir.getAbsolutePath());
+                StandardContext appContext = (StandardContext) tomcat
+                        .addWebapp(contextRoot, webappDir.getAbsolutePath());
                 appContext.setLoader(loader);
                 setContextXml(appContext);
                 appContext.addLifecycleListener(this);
 
                 Wrapper servlet = appContext.createWrapper();
-                String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS : SPRING_SERVLET_CLASS;
+                String servletClass = config.isEnableWeldListener() ? CDI_SERVLET_CLASS
+                        : SPRING_SERVLET_CLASS;
                 servlet.setServletClass(servletClass);
                 servlet.setName(TESTRUNNER_NAME);
                 servlet.setLoadOnStartup(2);
@@ -329,15 +341,13 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
     }
 
     private void startServer() {
-        try
-        {
+        try {
             tomcat.enableNaming();
             tomcat.setPort(config.getHttpPort());
             tomcat.start();
             isDeployed = true;
         }
-        catch (LifecycleException exc)
-        {
+        catch (LifecycleException exc) {
             exc.printStackTrace();
             throw new RuntimeException(exc);
         }
@@ -375,16 +385,15 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                }                
+                }
             }
         }
-        URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls.size()]),
-                getClass().getClassLoader().getParent());
-        return loader;        
+        URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls
+                .size()]), getClass().getClassLoader().getParent());
+        return loader;
     }
 
-    private void addWeldBeanManager(StandardContext appContext)
-    {
+    private void addWeldBeanManager(StandardContext appContext) {
         ContextResource resource = new ContextResource();
         resource.setAuth("Container");
         resource.setName(BEAN_MANAGER_NAME);
@@ -393,25 +402,28 @@ public class EmbeddedTomcat7Container implements ContainerLauncher, LifecycleLis
 
         appContext.getNamingResources().addResource(resource);
 
-        
+
         ContextResourceEnvRef resourceRef = new ContextResourceEnvRef();
         resourceRef.setName(BEAN_MANAGER_NAME);
         resourceRef.setType(BEAN_MANAGER_TYPE);
-        
+
         appContext.getNamingResources().addResourceEnvRef(resourceRef);
 
         appContext.addApplicationListener(WELD_SERVLET_LISTENER);
     }
 
+    @Override
     public URI getContextRootUri() {
         try {
-            return new URI(String.format("http://localhost:%d/%s/", config.getHttpPort(), getContextRoot()));
+            return new URI(String.format("http://localhost:%d/%s/",
+                    config.getHttpPort(), getContextRoot()));
         }
         catch (URISyntaxException exc) {
             throw new RuntimeException(exc);
         }
     }
 
+    @Override
     public void addMetadata(File file) {
         metadataFiles.add(file);
     }
