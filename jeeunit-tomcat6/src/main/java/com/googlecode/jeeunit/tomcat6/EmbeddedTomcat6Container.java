@@ -126,9 +126,20 @@ public class EmbeddedTomcat6Container implements ContainerLauncher {
      * @author hwellmann
      * 
      */
-    private static String[] excludes = { "catalina-", "annotations-api-",
-            "coyote-", "ecj-", "el-api-", "jasper-", "jsp-api-", "juli-",
-            ".cp", "servlet-", "shrinkwrap-", "xml-api" };
+    private static String[] excludes = { 
+        "catalina-", 
+        "annotations-api-",
+        "coyote-", 
+        "ecj-", 
+        "el-api-", 
+        "jasper-", 
+        "jsp-api-", 
+        "juli-",
+        ".cp", 
+        "servlet-", 
+        "shrinkwrap-", 
+        "xml-apis" 
+    };
 
     private Configuration config;
 
