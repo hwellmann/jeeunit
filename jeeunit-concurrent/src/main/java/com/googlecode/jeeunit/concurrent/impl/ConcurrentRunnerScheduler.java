@@ -29,6 +29,12 @@ import org.junit.runners.model.RunnerScheduler;
 
 import com.googlecode.jeeunit.concurrent.Concurrent;
 
+/**
+ * A {@link RunnerScheduler} for running JUnit tests concurrently.
+ * 
+ * @author hwellmann
+ *
+ */
 public class ConcurrentRunnerScheduler implements RunnerScheduler {
 
     private ExecutorService executorService;

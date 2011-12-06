@@ -17,7 +17,15 @@
  */
 package com.googlecode.jeeunit.spi;
 
-
+/**
+ * An Injector performs field injection on fields of jeeunit test cases.
+ * <p>
+ * Fields annotated by {@link Inject} shall be injected from the dependency injection container
+ * of the current test container (e.g. CDI or Spring).
+ * 
+ * @author hwellmann
+ *
+ */
 public interface Injector {
     void injectFields(Object target);
 }

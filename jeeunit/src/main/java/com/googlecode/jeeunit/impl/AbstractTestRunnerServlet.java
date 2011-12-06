@@ -36,6 +36,15 @@ import org.junit.runner.notification.Failure;
 
 import com.googlecode.jeeunit.spi.Injector;
 
+/**
+ * Base class for test runner servlets, providing the communication link
+ * between the embedded test container and the test driver.
+ * <p>
+ * Derived classes shall provide a method of dependency injection.
+ * 
+ * @author hwellmann
+ *
+ */
 public abstract class AbstractTestRunnerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

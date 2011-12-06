@@ -21,6 +21,12 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import com.googlecode.jeeunit.spi.Injector;
 
+/**
+ * Uses a Spring bean factory to injects fields into the given target.
+ * 
+ * @author hwellmann
+ *
+ */
 public class SpringInjector implements Injector {
     
     private AutowireCapableBeanFactory beanFactory;
