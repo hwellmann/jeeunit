@@ -25,6 +25,12 @@ import javax.enterprise.inject.spi.InjectionTarget;
 import com.googlecode.jeeunit.cdi.BeanManagerLookup;
 import com.googlecode.jeeunit.spi.Injector;
 
+/**
+ * Obtains a CDI {@link BeanManager} and injects fields into the given target.
+ * 
+ * @author hwellmann
+ *
+ */
 public class CdiInjector implements Injector {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

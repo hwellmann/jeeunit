@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Harald Wellmann
+ * Copyright 2011 Harald Wellmann
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,6 +22,12 @@ import javax.servlet.annotation.WebServlet;
 import com.googlecode.jeeunit.impl.AbstractTestRunnerServlet;
 import com.googlecode.jeeunit.spi.Injector;
 
+/**
+ * Test runner servlet using CDI injection (the default).
+ * 
+ * @author hwellmann
+ *
+ */
 @WebServlet(urlPatterns = "/testrunner")
 public class TestRunnerServlet extends AbstractTestRunnerServlet {
     private static final long serialVersionUID = 1L;

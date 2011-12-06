@@ -25,6 +25,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.googlecode.jeeunit.impl.AbstractTestRunnerServlet;
 import com.googlecode.jeeunit.spi.Injector;
 
+/**
+ * Test runner servlet using Spring injection from the root context of a web application.
+ * 
+ * @author hwellmann
+ *
+ */
 public class TestRunnerServlet extends AbstractTestRunnerServlet {
     private static final long serialVersionUID = 1L;
 

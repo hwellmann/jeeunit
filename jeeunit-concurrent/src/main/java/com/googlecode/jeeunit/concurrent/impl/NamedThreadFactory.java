@@ -20,15 +20,29 @@ package com.googlecode.jeeunit.concurrent.impl;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A factory for creating named threads belonging to a ThreadGroup.
+ * 
+ * @author hwellmann
+ *
+ */
 public class NamedThreadFactory implements ThreadFactory {
     private static AtomicInteger poolNumber = new AtomicInteger(1);
     private AtomicInteger threadNumber = new AtomicInteger(1);
     private ThreadGroup group;
 
+    /**
+     * Creates a NamedThreadFactory with a given poolName
+     * @param poolName  name prefix for all threads created by this factory
+     */
     public NamedThreadFactory(String poolName) {
         group = new ThreadGroup(poolName + "-" + poolNumber.getAndIncrement());
     }
 
+    /**
+     * Creates a new thread for the given runnable. The thread belongs to the group wrapped
+     * by this factory. 
+     */
     @Override
     public Thread newThread(Runnable r) {
         return new Thread(group, r, group.getName() + "-thread-" + threadNumber.getAndIncrement(), 0);
