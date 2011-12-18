@@ -22,7 +22,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import com.googlecode.jeeunit.spi.Injector;
 
 /**
- * Uses a Spring bean factory to injects fields into the given target.
+ * Uses a Spring bean factory to inject fields into the given target.
  * 
  * @author hwellmann
  *
@@ -31,13 +31,21 @@ public class SpringInjector implements Injector {
     
     private AutowireCapableBeanFactory beanFactory;
 
+    /**
+     * Constructs a SpringInjection using a given bean factory.
+     * @param beanFactory Spring bean factory
+     */
     public SpringInjector(AutowireCapableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 
+    /**
+     * Injects dependencies into the given target object whose lifecycle is not managed by 
+     * Spring itself.
+     * @param target  an object with injection points
+     */
     @Override
     public void injectFields(Object target) {
         beanFactory.autowireBean(target);
     }
-
 }

@@ -33,6 +33,11 @@ import com.googlecode.jeeunit.spi.Injector;
  */
 public class CdiInjector implements Injector {
 
+    /**
+     * Injects dependencies into the given target object whose lifecycle is not managed by 
+     * the BeanManager itself.
+     * @param target  an object with injection points
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void injectFields(Object target) {

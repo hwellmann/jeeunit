@@ -26,6 +26,11 @@ import javax.naming.NamingException;
 
 import com.googlecode.jeeunit.cdi.spi.BeanManagerProvider;
 
+/**
+ * Locates a CDI BeanManager, either via JNDI or using the Java SE ServiceLoader.
+ * @author hwellmann
+ *
+ */
 public class BeanManagerLookup {
 
     private static final String BEAN_MANAGER_JNDI = "java:comp/BeanManager";
@@ -55,7 +60,7 @@ public class BeanManagerLookup {
         return mgr;
     }
 
-    public static BeanManager getBeanManagerFromJndi()
+    private static BeanManager getBeanManagerFromJndi()
     {
         BeanManager mgr = getBeanManagerFromJndi(BEAN_MANAGER_JNDI);
         if (mgr == null) {

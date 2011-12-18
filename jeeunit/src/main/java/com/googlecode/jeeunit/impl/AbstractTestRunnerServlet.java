@@ -64,7 +64,7 @@ public abstract class AbstractTestRunnerServlet extends HttpServlet {
         }
     }
 
-    protected void runSuite(OutputStream os, Class<?> clazz, String methodName) throws IOException {
+    private void runSuite(OutputStream os, Class<?> clazz, String methodName) throws IOException {
 
         Injector injector = createInjector();
         Request classRequest = new ContainerTestRunnerClassRequest(clazz, injector);
@@ -83,5 +83,10 @@ public abstract class AbstractTestRunnerServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Creates an {@link Injector} to inject dependencies into jeeunit test instances.
+     * 
+     * @return injector
+     */
     protected abstract Injector createInjector();
 }
