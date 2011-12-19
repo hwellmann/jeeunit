@@ -3,7 +3,7 @@
   <parent>
     <artifactId>jeeunit-parent</artifactId>
     <groupId>com.googlecode.jeeunit</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>jeeunit-concurrent</artifactId>
   <name>jeeunit Concurrent Runners</name>
