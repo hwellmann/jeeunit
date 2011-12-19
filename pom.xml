@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.jeeunit</groupId>
   <version>0.9.0-SNAPSHOT</version>
@@ -267,7 +268,7 @@
         <artifactId>resin</artifactId>
         <version>4.0.23</version>
       </dependency>
-      
+
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
@@ -283,7 +284,6 @@
 
   <modules>
     <module>jeeunit</module>
-    <module>jeeunit-example</module>
     <module>jeeunit-weld-se</module>
     <module>jeeunit-glassfish</module>
     <module>jeeunit-concurrent</module>
@@ -295,6 +295,15 @@
     <module>jeeunit-cdi</module>
     <module>jeeunit-jboss7</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>test</id>
+      <modules>
+        <module>jeeunit-example</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
@@ -320,5 +329,5 @@
       </snapshots>
     </repository>
   </repositories>
-  
+
 </project>

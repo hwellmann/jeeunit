@@ -17,6 +17,8 @@
         <exclude>**/.classpath</exclude>
         <exclude>**/.project</exclude>
         <exclude>**/.settings/**</exclude>
+        <exclude>**/bin/**</exclude>
+        <exclude>**/tomcat.8080/**</exclude>
       </excludes>
     </fileSet>
   </fileSets>
