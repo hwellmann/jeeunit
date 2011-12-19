@@ -13,6 +13,7 @@
         <include>com.googlecode.jeeunit:jeeunit-cdi</include>
         <include>com.googlecode.jeeunit:jeeunit-concurrent</include>
         <include>com.googlecode.jeeunit:jeeunit-glassfish</include>
+        <include>com.googlecode.jeeunit:jeeunit-jboss7</include>
         <include>com.googlecode.jeeunit:jeeunit-resin</include>
         <include>com.googlecode.jeeunit:jeeunit-spring</include>
         <include>com.googlecode.jeeunit:jeeunit-tomcat6</include>
