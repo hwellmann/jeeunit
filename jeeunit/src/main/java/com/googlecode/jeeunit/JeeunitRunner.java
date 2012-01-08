@@ -21,14 +21,12 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URI;
 
-import org.junit.Ignore;
-import org.junit.internal.AssumptionViolatedException;
-import org.junit.internal.runners.model.EachTestNotifier;
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunNotifier;
+import org.junit.internal.runners.model.ReflectiveCallable;
+import org.junit.internal.runners.statements.Fail;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 import com.sun.jersey.api.client.Client;
@@ -49,34 +47,36 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
-    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        EachTestNotifier eachNotifier = makeNotifier(method, notifier);
-        if (method.getAnnotation(Ignore.class) != null) {
-            eachNotifier.fireTestIgnored();
-            return;
+    protected Statement methodBlock(FrameworkMethod method) {
+        Object test;
+        try {
+            test = new ReflectiveCallable() {
+                @Override
+                protected Object runReflectiveCall() throws Throwable {
+                    return createTest();
+                }
+            }.run();
+        }
+        catch (Throwable e) {
+            return new Fail(e);
         }
 
-        eachNotifier.fireTestStarted();
-        try {
-            Throwable result = getRemoteTestResult(method);
-            if (result instanceof AssumptionViolatedException) {
-                eachNotifier.addFailedAssumption((AssumptionViolatedException) result);
-            }
-            else if (result != null) {
-                eachNotifier.addFailure(result);
-            }
-        }
-        catch (IOException exc) {
-            exc.printStackTrace();
-            eachNotifier.addFailure(exc);
-        }
-        catch (ClassNotFoundException exc) {
-            exc.printStackTrace();
-            eachNotifier.addFailure(exc);
-        }
-        finally {
-            eachNotifier.fireTestFinished();
-        }
+        Statement statement = methodInvoker(method, test);
+        return statement;
+    }
+    
+    @Override
+    protected Statement methodInvoker(final FrameworkMethod method, Object test) {
+        return new Statement() {
+
+            @Override
+            public void evaluate() throws Throwable {
+                Throwable result = getRemoteTestResult(method);
+                if (result != null) {
+                    throw result;
+                }
+            }            
+        };
     }
 
     private Throwable getRemoteTestResult(FrameworkMethod method) throws IOException,
@@ -101,10 +101,4 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         return client.resource(uri);
 
     }
-
-    private EachTestNotifier makeNotifier(FrameworkMethod method, RunNotifier notifier) {
-        Description description = describeChild(method);
-        return new EachTestNotifier(notifier, description);
-    }
-
 }
