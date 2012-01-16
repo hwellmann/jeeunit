@@ -7,6 +7,7 @@
     <relativePath>..</relativePath>
   </parent>
   <artifactId>jeeunit-example-test-resin</artifactId>
+  <name>jeeunit Example Integration Tests on Resin</name>
   <dependencies>
     <dependency>
       <groupId>com.googlecode.jeeunit</groupId>
