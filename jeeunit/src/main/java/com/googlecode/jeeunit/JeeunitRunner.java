@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.internal.runners.statements.Fail;
@@ -29,6 +31,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 import com.googlecode.jeeunit.spi.ContainerLauncher;
+import com.googlecode.jeeunit.spi.Injector;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
@@ -36,6 +39,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
 
     private ContainerLauncher launcher;
     private WebResource testRunner;
+    private boolean useDelegate;
 
     public JeeunitRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -43,11 +47,18 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         launcher = ContainerLauncherLookup.getContainerLauncher();
         launcher.launch();
         URI contextRoot = launcher.autodeploy();
-        testRunner = getTestRunner(contextRoot);
+        if (contextRoot != null) {
+            useDelegate = true;
+            testRunner = getTestRunner(contextRoot);
+        }
     }
 
     @Override
     protected Statement methodBlock(FrameworkMethod method) {
+        if (!useDelegate) {
+            return super.methodBlock(method);
+        }
+
         Object test;
         try {
             test = new ReflectiveCallable() {
@@ -64,9 +75,12 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         Statement statement = methodInvoker(method, test);
         return statement;
     }
-    
+
     @Override
     protected Statement methodInvoker(final FrameworkMethod method, Object test) {
+        if (!useDelegate) {
+            return super.methodInvoker(method, test);
+        }
         return new Statement() {
 
             @Override
@@ -75,7 +89,7 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
                 if (result != null) {
                     throw result;
                 }
-            }            
+            }
         };
     }
 
@@ -100,5 +114,30 @@ public class JeeunitRunner extends BlockJUnit4ClassRunner {
         Client client = Client.create();
         return client.resource(uri);
 
+    }
+
+    @Override
+    protected Object createTest() throws Exception {
+        if (useDelegate) {
+            return super.createTest();
+        }
+        else {
+            Object test = super.createTest();
+            inject(test);
+            return test;
+        }
+    }
+
+    private void inject(Object test) {
+        Injector injector = findInjector();
+        injector.injectFields(test);
+    }
+
+    private Injector findInjector() {
+        Iterator<Injector> it = ServiceLoader.load(Injector.class).iterator();
+        if (it.hasNext()) {
+            return it.next();
+        }
+        throw new IllegalStateException("no Injector implementation found in META-INF/services");
     }
 }
