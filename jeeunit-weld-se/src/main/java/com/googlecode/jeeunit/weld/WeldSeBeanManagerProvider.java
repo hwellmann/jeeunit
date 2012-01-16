@@ -19,18 +19,12 @@ package com.googlecode.jeeunit.weld;
 
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.environment.se.WeldContainer;
-
 import com.googlecode.jeeunit.cdi.spi.BeanManagerProvider;
 
 public class WeldSeBeanManagerProvider implements BeanManagerProvider {
 
     @Override
     public BeanManager getBeanManager() {
-        Weld weld = new Weld();
-        WeldContainer container = weld.initialize();
-        BeanManager mgr = container.getBeanManager();
-        return mgr;
+        return WeldSeContainer.getInstance().getWeldContainer().getBeanManager();
     }
 }

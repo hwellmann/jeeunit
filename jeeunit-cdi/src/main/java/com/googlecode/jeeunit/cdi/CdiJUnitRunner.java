@@ -25,12 +25,17 @@ import javax.enterprise.inject.spi.InjectionTarget;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
+import com.googlecode.jeeunit.ContainerLauncherLookup;
+import com.googlecode.jeeunit.spi.ContainerLauncher;
+
 public class CdiJUnitRunner extends BlockJUnit4ClassRunner
 {
     
     public CdiJUnitRunner(Class<?> klass) throws InitializationError
     {
         super(klass);
+        ContainerLauncher launcher = ContainerLauncherLookup.getContainerLauncher();
+        launcher.launch();
     }
 
     @Override
