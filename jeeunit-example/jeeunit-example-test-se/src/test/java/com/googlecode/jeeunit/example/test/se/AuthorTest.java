@@ -29,11 +29,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.googlecode.jeeunit.cdi.CdiJUnitRunner;
+import com.googlecode.jeeunit.JeeunitRunner;
 import com.googlecode.jeeunit.example.model.Author;
 import com.googlecode.jeeunit.example.model.Book;
 
-@RunWith(CdiJUnitRunner.class)
+@RunWith(JeeunitRunner.class)
 public class AuthorTest {
 
     @Inject
