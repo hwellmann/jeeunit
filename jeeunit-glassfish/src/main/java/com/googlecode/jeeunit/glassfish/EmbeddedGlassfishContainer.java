@@ -42,7 +42,6 @@ import org.glassfish.embeddable.archive.ScatteredArchive.Type;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.googlecode.jeeunit.impl.ClasspathFilter;
 import com.googlecode.jeeunit.spi.ContainerLauncher;
 
 /**
@@ -138,7 +137,12 @@ public class EmbeddedGlassfishContainer implements ContainerLauncher {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                shutdown();                
+                try {
+                    shutdownInternal();
+                }
+                catch (GlassFishException exc) {
+                    exc.printStackTrace();
+                }                
                 if (tmpBeansXml != null) {
                     tmpBeansXml.delete();
                     tmpDir.delete();
@@ -281,14 +285,18 @@ public class EmbeddedGlassfishContainer implements ContainerLauncher {
 
     public void shutdown() {
         try {
-            if (glassFish != null) {
-                glassFish.getDeployer().undeploy(getApplicationName());
-                glassFish.stop();
-                glassFish = null;
-            }
+            shutdownInternal();
         }
         catch (GlassFishException exc) {
             throw new RuntimeException(exc);
+        }
+    }
+
+    private void shutdownInternal() throws GlassFishException {
+        if (glassFish != null) {
+            glassFish.getDeployer().undeploy(getApplicationName());
+            glassFish.stop();
+            glassFish = null;
         }
     }
 
