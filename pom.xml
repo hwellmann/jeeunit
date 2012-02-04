@@ -293,6 +293,7 @@
     <module>jeeunit-spring</module>
     <module>jeeunit-cdi</module>
     <module>jeeunit-jboss7</module>
+    <module>jeeunit-openwebbeans</module>
   </modules>
 
   <profiles>
