@@ -14,6 +14,7 @@
     <module>jeeunit-example-model</module>
     <module>jeeunit-example-service</module>
     <module>jeeunit-example-test</module>
+    <module>jeeunit-example-test-openwebbeans</module>
     <module>jeeunit-example-test-se</module>
     <module>jeeunit-example-test-spring</module>
     <module>jeeunit-example-service-bmt</module>
