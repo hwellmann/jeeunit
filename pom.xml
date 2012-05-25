@@ -13,7 +13,7 @@
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <glassfish.version>3.1.1</glassfish.version>
+    <glassfish.version>3.1.2</glassfish.version>
     <hibernate.version>3.6.8.Final</hibernate.version>
     <logback.version>0.9.20</logback.version>
     <slf4j.version>1.5.11</slf4j.version>
@@ -115,13 +115,13 @@
         <version>4.10</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.extras</groupId>
+        <groupId>org.glassfish.main.extras</groupId>
         <artifactId>glassfish-embedded-all</artifactId>
         <version>${glassfish.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.common</groupId>
+        <groupId>org.glassfish.main.common</groupId>
         <artifactId>scattered-archive-api</artifactId>
         <version>${glassfish.version}</version>
       </dependency>
@@ -260,7 +260,7 @@
       <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-client</artifactId>
-        <version>1.8</version>
+        <version>1.12</version>
       </dependency>
       <dependency>
         <groupId>com.caucho</groupId>

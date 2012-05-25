@@ -19,7 +19,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.common</groupId>
+      <groupId>org.glassfish.main.common</groupId>
       <artifactId>scattered-archive-api</artifactId>
     </dependency>
     <dependency>
