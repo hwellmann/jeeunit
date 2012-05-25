@@ -19,7 +19,7 @@
     <logback.version>1.0.3</logback.version>
     <openwebbeans.version>1.1.4</openwebbeans.version>
     <slf4j.version>1.6.4</slf4j.version>
-    <spring.version>3.1.0.RELEASE</spring.version>
+    <spring.version>3.1.1.RELEASE</spring.version>
     <tomcat6.version>6.0.35</tomcat6.version>
     <tomcat7.version>7.0.27</tomcat7.version>
     <weld.version>1.1.8.Final</weld.version>
